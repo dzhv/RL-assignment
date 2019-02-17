@@ -11,7 +11,7 @@ echo "Environment Initialized"
 # Sleep is needed to make sure doesn't get connected too soon, as unum 1 (goalie)
 
 sleep 5
-./SARSABase.py --numOpponents=1 --numEpisodes=500 &
+./SARSA/SARSABase.py --numOpponents=1 --numEpisodes=500 &
 echo "Attacker Controller Initialized"
 
 sleep 5

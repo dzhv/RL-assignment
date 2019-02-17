@@ -1,0 +1,26 @@
+SARSA experiments
+
+(learningRate, discountFactor, epsilon)
+0.2, 0.99, 0.25
+max_reduction = 0.95
+reduction_step = 0.25
+
+82 Goals, 500 Episodes
+
+-----------
+
+(learningRate, discountFactor, epsilon)
+0.2, 0.99, 0.2
+max_reduction = 0.95
+reduction_step = 0.25
+
+60 Goals, 500 Episodes
+
+------------
+
+(learningRate, discountFactor, epsilon)
+0.2, 0.99, 0.3
+max_reduction = 0.95
+reduction_step = 0.25
+
+20 Goals, 500 Episodes   // ???

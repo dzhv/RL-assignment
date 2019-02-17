@@ -1,26 +1,8 @@
 SARSA experiments
 
 (learningRate, discountFactor, epsilon)
-0.2, 0.99, 0.25
-max_reduction = 0.95
-reduction_step = 0.25
+agent = SARSAAgent(0.15, 0.99, 0.25)
+decay_constant = 0.003
+65 GOALS, 500 Episodes
 
-82 Goals, 500 Episodes
-
------------
-
-(learningRate, discountFactor, epsilon)
-0.2, 0.99, 0.2
-max_reduction = 0.95
-reduction_step = 0.25
-
-60 Goals, 500 Episodes
-
-------------
-
-(learningRate, discountFactor, epsilon)
-0.2, 0.99, 0.3
-max_reduction = 0.95
-reduction_step = 0.25
-
-20 Goals, 500 Episodes   // ???
+-----

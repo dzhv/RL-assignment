@@ -6,7 +6,7 @@
 
 ./../../../bin/HFO --defense-agents=2 --offense-agents=1 --offense-on-ball 11 --trials 500 --headless --deterministic --discrete=True --frames-per-trial 2000 --untouched-time 2000 &
 sleep 5
-./DiscreteHFO/Initiator.py --numTrials=500 --numPlayingDefenseNPCs=1 --numAgents=1 &
+./DiscreteHFO/Initiator.py --numTrials=500 --numPlayingDefenseNPCs=1 --numAgents=1 >/dev/null 2>&1 &
 echo "Environment Initialized"
 
 # Sleep is needed to make sure doesn't get connected too soon, as unum 1 (goalie)
@@ -16,11 +16,11 @@ sleep 5
 echo "Attacker Controller Initialized"
 
 sleep 5
-./DiscreteHFO/Goalkeeper.py --numEpisodes=500 &
+./DiscreteHFO/Goalkeeper.py --numEpisodes=500 >/dev/null 2>&1 &
 echo "Goalkeeper Initialized"
 
 sleep 5
-./DiscreteHFO/DiscretizedDefendingPlayer.py --id=1 --numEpisodes=500 &
+./DiscreteHFO/DiscretizedDefendingPlayer.py --id=1 --numEpisodes=500 >/dev/null 2>&1 &
 echo "Defending Player Initialized"
 
 sleep 5

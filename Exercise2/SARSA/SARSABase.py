@@ -4,24 +4,25 @@
 from DiscreteHFO.HFOAttackingPlayer import HFOAttackingPlayer
 from DiscreteHFO.Agent import Agent
 import argparse
-from collections import defaultdict
+from collections import defaultdict, deque
 import random
 
 class SARSAAgent(Agent):
 	def __init__(self, learningRate, discountFactor, epsilon, initVals=0.0):
 		super(SARSAAgent, self).__init__()
 
+		self.initLearningRate = learningRate
 		self.setLearningRate(learningRate)
+		self.initEpsilon = epsilon
 		self.setEpsilon(epsilon)
 		self.discountFactor = discountFactor
 
-		self.currState = None
-		self.nextState = None
-		self.action = None
-		self.reward = 0
-
 		# dictionary with automatically assigned default value for a new key
 		self.Q = defaultdict(lambda: initVals)
+
+		# this is a queue holding previous and current (s, a, r) values
+		# for the learn() function
+		self.experienceQueue = deque([])
 
 		self.possibleActions = ['DRIBBLE_UP', 'DRIBBLE_DOWN', 
 			'DRIBBLE_LEFT', 'DRIBBLE_RIGHT', 'KICK']
@@ -55,7 +56,17 @@ class SARSAAgent(Agent):
 
 
 	def learn(self):
-		Qkey = self.key(self.currState, self.action)
+		if len(self.experienceQueue < 2):
+			print("\nUh oh, this was not supposed to happen!")
+			return 0
+
+		# learning is done for the previous state
+		previousState, previousAction, previousReward = self.experienceQueue.popleft()
+		currState, currAction, currReward = self.experienceQueue.popleft()
+		self.experienceQueue.append((currState, currAction, currReward))
+
+
+		Qkey = self.key(currState, currAction)
 		initialQVal = self.Q[Qkey]
 
 		nextAction = self.policy(self.nextState)
@@ -87,23 +98,21 @@ class SARSAAgent(Agent):
 		return
 
 	def computeHyperparameters(self, numTakenActions, episode):
-		max_reduction = 0.95
-		reduction_step = 0.25
-		reduction = episode // 100 * reduction_step
-		reduction = reduction if reduction < max_reduction else max_reduction
+		decay_constant = 0.003
+		e = 2.718
 
-		self.currLearningRate = self.initLearningRate * (1 - reduction)
-		self.currEpsilon = self.initEpsilon * (1 - reduction)
+		factor = e ** (- decay_constant * episode)
 
-		return self.currLearningRate, self.currEpsilon
+		learningRate = self.initLearningRate * factor
+		epsilon = self.initEpsilon * factor
+
+		return learningRate, epsilon
 		
 
 	def setLearningRate(self, learningRate):
-		self.initLearningRate = learningRate
 		self.currLearningRate = learningRate
 
 	def setEpsilon(self, epsilon):
-		self.initEpsilon = epsilon
 		self.currEpsilon = epsilon
 
 if __name__ == '__main__':
@@ -116,7 +125,7 @@ if __name__ == '__main__':
 
 	args=parser.parse_args()
 
-	numEpisodes = 500
+	numEpisodes = args.numEpisodes
 	# Initialize connection to the HFO environment using HFOAttackingPlayer
 	hfoEnv = HFOAttackingPlayer(numOpponents = args.numOpponents, numTeammates = args.numTeammates, agentId = args.id)
 	hfoEnv.connectToServer()
@@ -138,16 +147,20 @@ if __name__ == '__main__':
 
 		while status==0:
 			learningRate, epsilon = agent.computeHyperparameters(numTakenActions, episode)
+			agent.setEpsilon(epsilon)
+			agent.setLearningRate(learningRate)
+
 			obsCopy = observation.copy()
 			agent.setState(agent.toStateRepresentation(obsCopy))
 			action = agent.act()
+			numTakenActions += 1
 
 			nextObservation, reward, done, status = hfoEnv.step(action)
 			print(obsCopy, action, reward, nextObservation)
 			agent.setExperience(agent.toStateRepresentation(obsCopy), action, reward, status,
 				agent.toStateRepresentation(nextObservation))
 			
-			if not epsStart :
+			if not epsStart:
 				agent.learn()
 			else:
 				epsStart = False

@@ -44,7 +44,8 @@ class HFOAttackingPlayer(object):
 	def reset(self):
 		self.curState = [(self.initPositions[self.episode][0],self.initPositions[self.episode][1])]
 		for oppoIndex in range(len(self.oppoPositions[self.episode])):
-			self.curState.append((self.oppoPositions[self.episode][oppoIndex][0],self.oppoPositions[self.episode][oppoIndex][1]))
+			self.curState.append((self.oppoPositions[self.episode][oppoIndex][0],
+				self.oppoPositions[self.episode][oppoIndex][1]))
 		
 		self.initDiscCoordX = self.initPositions[self.episode][0]
 		self.initDiscCoordY = self.initPositions[self.episode][1]
@@ -55,7 +56,8 @@ class HFOAttackingPlayer(object):
 
 	# Establish connection with HFO server
 	def connectToServer(self):
-		self.hfo.connectToServer(HIGH_LEVEL_FEATURE_SET,self.config_dir,self.port,self.server_addr,self.team_name,self.play_goalie)
+		self.hfo.connectToServer(HIGH_LEVEL_FEATURE_SET,self.config_dir,self.port,self.server_addr,
+			self.team_name,self.play_goalie)
 
 	# From a location feature given by HFO, output the discrete representation of that location
 	def getDiscretizedLocation(self, coordX, coordY):

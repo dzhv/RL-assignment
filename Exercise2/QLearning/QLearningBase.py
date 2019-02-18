@@ -99,7 +99,7 @@ class QLearningAgent(Agent):
 		self.currEpsilon = epsilon
 
 	def reset(self):
-		return
+		self.experienceQueue.clear()
 		
 	def computeHyperparameters(self, numTakenActions, episodeNumber):
 		# exponential decay
@@ -129,7 +129,7 @@ if __name__ == '__main__':
 	hfoEnv.connectToServer()
 
 	# Initialize a Q-Learning Agent
-	agent = QLearningAgent(learningRate = 0.15, discountFactor = 0.99, epsilon = 1)
+	agent = QLearningAgent(learningRate = 0.1, discountFactor = 0.99, epsilon = 1)
 	numEpisodes = args.numEpisodes
 
 	# Run training using Q-Learning
@@ -151,7 +151,7 @@ if __name__ == '__main__':
 			numTakenActions += 1
 			
 			nextObservation, reward, done, status = hfoEnv.step(action)
-			print("REWARD: {0}".format(reward))
+			#print("REWARD: {0}".format(reward))
 			agent.setExperience(agent.toStateRepresentation(obsCopy), action, reward, status, 
 				agent.toStateRepresentation(nextObservation))
 			update = agent.learn()

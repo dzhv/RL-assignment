@@ -36,8 +36,9 @@ class MonteCarloAgent(Agent):
 		return True 
 
 	def learn(self):
-
+		print("LEARNING:")
 		G = 0
+		resultQueue = deque([])
 		while len(self.experienceQueue) > 0:
 			state, action, reward = self.experienceQueue.pop()
 			G = self.discountFactor * G + reward
@@ -49,11 +50,20 @@ class MonteCarloAgent(Agent):
 			
 			n = self.stateActionVisits[key]
 			self.stateActionVisits[key] += 1
+			
+			print("State: {0}, action: {1}, reward: {2}".format(state, action, reward))
+			print("Init key {0} value: {1}".format(key, self.Q[key]))
 			self.Q[key] = self.Q[key] * (n / (n+1)) + G / (n+1) 
+			print("Updated value: {0}".format(self.Q[key]))
+			
+			resultQueue.appendleft(self.Q[key])
 
+		print("resultQueue")
+		print(resultQueue)
+		return self.Q, list(resultQueue)
 
 	def toStateRepresentation(self, state):
-		self.currState = state
+		return str(state)
 
 	def setExperience(self, state, action, reward, status, nextState):
 		self.experienceQueue.append((state, action, reward))
@@ -62,11 +72,10 @@ class MonteCarloAgent(Agent):
 		self.currState = state
 
 	def reset(self):
-		raise NotImplementedError
+		self.experienceQueue.clear()
 
 	def greedyAction(self, state):
-		# finds an action with the biggest Q value for the state
-		# returns (action, QValue) pair
+		# finds an action with the biggest Q value for the state		
 
 		maxQ = None
 		maxAction = None
@@ -78,6 +87,10 @@ class MonteCarloAgent(Agent):
 				maxAction = action
 
 		return maxAction
+
+	def randomAction(self):
+		actionIndex = random.randint(0, len(self.possibleActions) - 1)
+		return self.possibleActions[actionIndex]
 
 	def policy(self, state):
 		# gives the next action in an epsilon-greedy fashion
@@ -99,11 +112,10 @@ class MonteCarloAgent(Agent):
 		e = 2.718
 
 		factor = e ** (- decay_constant * episode)
-
-		learningRate = self.initLearningRate * factor
+		
 		epsilon = self.initEpsilon * factor
 
-		return learningRate, epsilon
+		return epsilon
 
 	def key(self, state, action):
 		return "state: {0}, action: {1}".format(state, action)
@@ -129,7 +141,8 @@ if __name__ == '__main__':
 	numEpisodes = args.numEpisodes
 	numTakenActions = 0
 	# Run training Monte Carlo Method
-	for episode in range(numEpisodes):	
+	for episode in range(numEpisodes):
+		print("EPISODE: {0}/{1}".format(episode, numEpisodes))	
 		agent.reset()
 		observation = hfoEnv.reset()
 		status = 0

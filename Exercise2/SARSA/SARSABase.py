@@ -45,9 +45,9 @@ class SARSAAgent(Agent):
 				maxAction = action
 
 		return maxAction
-
-	# gives the next action in an epsilon-greedy fashion
+	
 	def policy(self, state):
+		# gives the next action in an epsilon-greedy fashion
 		explore = random.random() < self.currEpsilon
 		if explore:
 			return self.randomAction()
@@ -56,28 +56,35 @@ class SARSAAgent(Agent):
 
 
 	def learn(self):
-		if len(self.experienceQueue < 2):
-			print("\nUh oh, this was not supposed to happen!")
-			return 0
+		if len(self.experienceQueue) != 2:
+			raise Exception("Uh oh, this was not supposed to happen!")
+
+		# change into this later
+		# if len(self.experienceQueue) < 2:
+			# return 0
 
 		# learning is done for the previous state
-		previousState, previousAction, previousReward = self.experienceQueue.popleft()
+		prevState, prevAction, prevReward = self.experienceQueue.popleft()
 		currState, currAction, currReward = self.experienceQueue.popleft()
 		self.experienceQueue.append((currState, currAction, currReward))
 
+		prevKey = self.key(prevState, prevAction)
+		currKey = self.key(currState, currAction)
+		initialQVal = self.Q[prevKey]
+		nextQValue = self.Q[currKey]
+		
+		target = prevReward + self.discountFactor * nextQValue
+		self.Q[prevKey] = initialQVal + self.currLearningRate * (target - initialQVal)
 
-		Qkey = self.key(currState, currAction)
-		initialQVal = self.Q[Qkey]
+		print("Prev state: {0}".format(prevState))
+		print("Prev reward: {0}".format(prevReward))
+		print("Prev action: {0}".format(prevAction))
+		print("Current state: {0}".format(currState))
+		print("Current reward: {0}".format(currReward))
+		print("Current action: {0}".format(currAction))
+		print("Update: {0} -> {1}".format(initialQVal, self.Q[prevKey]))
 
-		nextAction = self.policy(self.nextState)
-		nextQValue = self.Q[self.key(self.nextState, nextAction)]
-
-		reward = 0 if self.reward is None else self.reward
-		target = reward + self.discountFactor * nextQValue
-		self.Q[Qkey] = initialQVal + self.currLearningRate * (target - initialQVal)
-
-		return self.Q[Qkey] - initialQVal
-
+		return self.Q[prevKey] - initialQVal
 
 	def act(self):
 		return self.policy(self.currState)
@@ -86,19 +93,16 @@ class SARSAAgent(Agent):
 		self.currState = state
 
 	def setExperience(self, state, action, reward, status, nextState):
-		self.currState = state
-		self.action = action
-		self.reward = reward
-		self.nextState = nextState
+		self.experienceQueue.append((state, action, reward))
 
 	def toStateRepresentation(self, state):
 		return str(state)
 
 	def reset(self):
-		return
+		self.experienceQueue.clear()
 
 	def computeHyperparameters(self, numTakenActions, episode):
-		decay_constant = 0.003
+		decay_constant = 0.0035
 		e = 2.718
 
 		factor = e ** (- decay_constant * episode)
@@ -107,7 +111,6 @@ class SARSAAgent(Agent):
 		epsilon = self.initEpsilon * factor
 
 		return learningRate, epsilon
-		
 
 	def setLearningRate(self, learningRate):
 		self.currLearningRate = learningRate
@@ -127,11 +130,12 @@ if __name__ == '__main__':
 
 	numEpisodes = args.numEpisodes
 	# Initialize connection to the HFO environment using HFOAttackingPlayer
-	hfoEnv = HFOAttackingPlayer(numOpponents = args.numOpponents, numTeammates = args.numTeammates, agentId = args.id)
+	hfoEnv = HFOAttackingPlayer(numOpponents = args.numOpponents, 
+		numTeammates = args.numTeammates, agentId = args.id)
 	hfoEnv.connectToServer()
 
 	# Initialize a SARSA Agent  (learningRate, discountFactor, epsilon)
-	agent = SARSAAgent(0.2, 0.99, 0.25)
+	agent = SARSAAgent(learningRate=0.1, discountFactor=0.99, epsilon=1)
 
 	# Run training using SARSA
 	numTakenActions = 0 

@@ -17,6 +17,9 @@ class MonteCarloAgent(Agent):
 
 		# dictionary with automatically assigned default value for a new key
 		self.Q = defaultdict(lambda: initVals)
+		# dictionary wiht counts of visits for each state-action pair
+		# used for computing iterative average of returns 
+		self.stateActionVisits = defaultdict(lambda: initVals)
 
 		self.experienceQueue = deque([])
 
@@ -24,7 +27,8 @@ class MonteCarloAgent(Agent):
 			'DRIBBLE_LEFT', 'DRIBBLE_RIGHT', 'KICK']
 
 	def firstVisit(self, state, action, queue):
-		# checks whether state action pair is the only one in the experience queue
+		# checks whether state action pair exists in the experience queue
+		# if it does not exists, this is the first visit of state action
 		for i in range(len(queue)):
 			s, a, r = queue[i]
 			if state == s and action == a:
@@ -41,11 +45,11 @@ class MonteCarloAgent(Agent):
 			if not self.firstVisit(state, action, self.experienceQueue):
 				continue
 
-			Qkey = self.key(state, action)
-			# sugalvot, kaip daryt rolling average
-			self.Q[Qkey] = 
-
-
+			key = self.key(state, action)
+			
+			n = self.stateActionVisits[key]
+			self.stateActionVisits[key] += 1
+			self.Q[key] = self.Q[key] * (n / (n+1)) + G / (n+1) 
 
 
 	def toStateRepresentation(self, state):

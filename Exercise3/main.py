@@ -14,15 +14,15 @@ os.environ['OMP_NUM_THREADS'] = '1'
 if __name__ == "__main__" :
 
 	config = {
-		"n_workers": 1,
-		"epsilons": [1, 0.5, 0.75],
+		"n_workers": 5,
+		"epsilons": [1, 0.75, 0.5, 0.25, 0],
 		"discountFactor": 0.99,
 		"learning_rate": 0.1,
 		"learning_network_update_interval": 6,
 		"target_network_update_interval": 200,
 		"parameterStoragePath": "model_weights/weights_",
-		"parameter_save_frequency": 1000000,
-		"numEpisodes": 1000,
+		"parameter_save_frequency": 500000,
+		"numEpisodes": 10000,
 	}
 	workers = worker_factory.create_workers(config)
 	for w in workers:

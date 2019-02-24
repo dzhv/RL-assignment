@@ -22,8 +22,10 @@ def increment_counter(counter):
 
 def train(idx, networks, optimizer, counter, environment, policy, config):
 
+	counterValue = 0
 	for i in range(config["numEpisodes"]):
 		print("\nEpisode {0}/{1}\n".format(i, config["numEpisodes"]))
+		print("Counter: {0}".format(counterValue))
 
 		experienceQueue = deque([])
 		# gal dar kažką reik resetint?
@@ -58,6 +60,7 @@ def train(idx, networks, optimizer, counter, environment, policy, config):
 				networks["target"].load_state_dict(networks["learning"].state_dict())
 
 			if counterValue % config["parameter_save_frequency"] == 0:
+				print("Saving target network, counter: {0}".format(counterValue))
 				saveModelNetwork(networks["target"], 
 					config["parameterStoragePath"] + str(counterValue // config["parameter_save_frequency"]) + ".out")
 		
@@ -70,10 +73,7 @@ def computeTargets(reward, nextObservation, discountFactor, done, targetNetwork)
 		return reward
 
 	_, qmax = policy.greedyAction(nextObservation, targetNetwork, computePrediction)
-	res =  reward + discountFactor * qmax
-	print("computeTargets res type: {0}".format(type(res)))
-	print("item: {0}".format(res.item()))
-	return res
+	return reward + discountFactor * qmax
 
 def computePrediction(state, action, valueNetwork):	
 	state = state.view(-1)
@@ -81,10 +81,7 @@ def computePrediction(state, action, valueNetwork):
 	action_tensor = one_hot_encode(action)
 	model_input = torch.cat((state, action_tensor))
 	
-	res =  valueNetwork(model_input)
-	print("computePrediction res type: {0}".format(type(res)))
-	print("item: {0}".format(res.item()))
-	return res
+	return valueNetwork(model_input)
 	
 # Function to save parameters of a neural network in pytorch.
 def saveModelNetwork(model, strDirectory):

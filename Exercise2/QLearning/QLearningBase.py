@@ -62,6 +62,9 @@ class QLearningAgent(Agent):
 		return self.greedyAction(state)
 
 	def learn(self):
+
+		# pagalvot apie terminal state update visuose metoduose
+
 		Qkey = self.key(self.currState, self.action)
 		initialQVal = self.Q[Qkey]
 				

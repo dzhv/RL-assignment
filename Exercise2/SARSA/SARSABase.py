@@ -56,12 +56,8 @@ class SARSAAgent(Agent):
 
 
 	def learn(self):
-		if len(self.experienceQueue) != 2:
-			raise Exception("Uh oh, this was not supposed to happen!")
-
-		# change into this later
-		# if len(self.experienceQueue) < 2:
-			# return 0
+		if len(self.experienceQueue) < 2:
+			return 0
 
 		# learning is done for the previous state
 		prevState, prevAction, prevReward = self.experienceQueue.popleft()
@@ -107,7 +103,7 @@ class SARSAAgent(Agent):
 
 		factor = e ** (- decay_constant * episode)
 
-		learningRate = self.initLearningRate * factor
+		learningRate = self.initLearningRate# * factor
 		epsilon = self.initEpsilon * factor
 
 		return learningRate, epsilon

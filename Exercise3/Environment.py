@@ -7,6 +7,7 @@ import math
 import random
 import os
 import time
+import torch
 
 class HFOEnv(object):
 
@@ -32,7 +33,7 @@ class HFOEnv(object):
 	# Method to initialize the server for HFO environment
 	def startEnv(self):
 		if self.numTeammates == 0:
-			os.system("./../../../bin/HFO --seed {} --defense-npcs=0 --defense-agents={} --offense-agents=1 --trials 8000 --untouched-time 500 --frames-per-trial 500 --port {} --fullstate &".format(str(self.seed),
+			os.system("./../../../bin/HFO --seed {} --defense-npcs=0 --headless --defense-agents={} --offense-agents=1 --trials 8000 --untouched-time 500 --frames-per-trial 500 --port {} --fullstate &".format(str(self.seed),
 				str(self.numOpponents), str(self.port)))
 		else :
 			os.system("./../../../bin/HFO --seed {} --defense-agents={} --defense-npcs=0 --offense-npcs={} --offense-agents=1 --trials 8000 --untouched-time 500 --frames-per-trial 500 --port {} --fullstate &".format(
@@ -76,21 +77,9 @@ class HFOEnv(object):
 
 		return status, self.curState
 
-	# Define the rewards you use in this function
-	# You might also give extra information on the name of each rewards
-	# for monitoring purposes.
-	
-	def get_reward(self, status, nextState):
-
-		reward = 0.0
-		info = {}
-
-		return reward, info
-
 	# Method that serves as an interface between a script controlling the agent
 	# and the environment. Method returns the nextState, reward, flag indicating
 	# end of episode, and current status of the episode
-
 	def step(self, action_params):
 		status, nextState = self.act(action_params)
 		done = (status!=IN_GAME)
@@ -104,9 +93,32 @@ class HFOEnv(object):
 
 	# Preprocess the state representation in this function
 	def preprocessState(self, state):
-		return state
+		return torch.tensor(state).float()
 
+	# Define the rewards you use in this function
+	# You might also give extra information on the name of each rewards
+	# for monitoring purposes.
+	def get_reward(self, status, nextState):
+		reward = 0.0
+		info = {}
+		# print("GOAL value: {0}".format(GOAL))    ==  1		
+		# print("CAPTURED_BY_DEFENSE value: {0}".format(CAPTURED_BY_DEFENSE)) == 2
+		# print("OUT_OF_BOUNDS value: {0}".format(OUT_OF_BOUNDS))   ==  3
 
+		if status == GOAL:
+			reward = 1
+			info = { "reason": "GOAL" }
+		elif status == CAPTURED_BY_DEFENSE:
+			reward = -1
+			info = { "reason": "CAPTURED_BY_DEFENSE" }
+		elif status == OUT_OF_BOUNDS:
+			reward = -0.5
+			info = { "reason": "Out of bounds" }
+		else:
+			info = { "reason": "Nothing happened"}
+		
+		# 		print("Status: {0}, Reward: {1} granted. Reason: {2}".format(status, reward, info))
+		return reward, info
 
 
 

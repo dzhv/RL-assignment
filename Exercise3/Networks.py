@@ -9,9 +9,19 @@ import math
 # and define the computations for the forward pass in the forward method.
 
 class ValueNetwork(nn.Module):
-	def __init__(self):
+	def __init__(self, input_d, output_d):
 		super(ValueNetwork, self).__init__()
 
-	def forward(self, inputs) :
-		
-		return 
+		H = 50
+		self.model = torch.nn.Sequential(
+          torch.nn.Linear(input_d, H),
+          torch.nn.ReLU(),
+          torch.nn.Linear(H, H),
+          torch.nn.ReLU(),
+          torch.nn.Linear(H, H),
+          torch.nn.ReLU(),
+          torch.nn.Linear(H, output_d),
+        )
+
+	def forward(self, inputs):		
+		return self.model(inputs)

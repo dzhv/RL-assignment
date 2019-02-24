@@ -64,19 +64,27 @@ def train(idx, networks, optimizer, counter, environment, policy, config):
 
 
 def computeTargets(reward, nextObservation, discountFactor, done, targetNetwork):
+	nextObservation = nextObservation.view(-1)
 	# get q value of the greedy action
 	if done:
 		return reward
 
 	_, qmax = policy.greedyAction(nextObservation, targetNetwork, computePrediction)
-	return reward + discountFactor * qmax
-
+	res =  reward + discountFactor * qmax
+	print("computeTargets res type: {0}".format(type(res)))
+	print("item: {0}".format(res.item()))
+	return res
 
 def computePrediction(state, action, valueNetwork):	
+	state = state.view(-1)
+
 	action_tensor = one_hot_encode(action)
 	model_input = torch.cat((state, action_tensor))
 	
-	return valueNetwork.forward(model_input)	
+	res =  valueNetwork(model_input)
+	print("computePrediction res type: {0}".format(type(res)))
+	print("item: {0}".format(res.item()))
+	return res
 	
 # Function to save parameters of a neural network in pytorch.
 def saveModelNetwork(model, strDirectory):

@@ -93,7 +93,7 @@ class HFOEnv(object):
 
 	# Preprocess the state representation in this function
 	def preprocessState(self, state):
-		return torch.tensor(state).float()
+		return torch.tensor([state]).float()
 
 	# Define the rewards you use in this function
 	# You might also give extra information on the name of each rewards

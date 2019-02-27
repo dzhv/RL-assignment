@@ -20,14 +20,12 @@ def create_workers(config):
     target_network = network_factory.create_network()
     learning_network.load_state_dict(target_network.state_dict())
 
-    optimizer = SharedAdam(learning_network.parameters(), lr=1e-4)
+    optimizer = SharedAdam(learning_network.parameters(), lr=config["learning_rate"])
     optimizer.share_memory()
 
     workers = []
     for idx in range(0, config["n_workers"]):
-        # worker_network = network_factory.create_network()
         networks = {
-            # "worker": worker_network
             "learning": learning_network,
             "target": target_network 
         }

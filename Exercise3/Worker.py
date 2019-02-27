@@ -51,10 +51,7 @@ def train(idx, networks, optimizer, counter, environment, policy, config):
 				optimizer.zero_grad()	
 				loss.backward()
 				
-				optimizer.step()
-
-			if done:
-				break
+				optimizer.step()			
 
 			if counterValue % config["target_network_update_interval"] == 0:
 				networks["target"].load_state_dict(networks["learning"].state_dict())
@@ -63,8 +60,16 @@ def train(idx, networks, optimizer, counter, environment, policy, config):
 				print("Saving target network, counter: {0}".format(counterValue))
 				saveModelNetwork(networks["target"], 
 					config["parameterStoragePath"] + str(counterValue // config["parameter_save_frequency"]) + ".out")
-		
 
+			if done:
+				break
+
+
+	# save the final model weights
+	if idx == 0:	# check the id so that only 1 worker would perform the saving
+		print("Saving final target network, counter: {0}".format(counterValue))
+		saveModelNetwork(networks["target"], 
+			config["parameterStoragePath"] + str(counterValue // config["parameter_save_frequency"]) + ".out")
 
 def computeTargets(reward, nextObservation, discountFactor, done, targetNetwork):
 	nextObservation = nextObservation.view(-1)

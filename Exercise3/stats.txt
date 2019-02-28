@@ -1,0 +1,31 @@
+Random agent statistics (1000 episodes):
+
+TotalFrames = 144296, AvgFramesPerTrial = 144.2, AvgFramesPerGoal = 171.4
+Trials             : 1001
+Goals              : 593
+Defense Captured   : 95
+Balls Out of Bounds: 312
+Out of Time        : 1
+
+
+Greedy policy
+------------
+
+Model after 1000 000 training steps
+with a model (H = 50):
+	torch.nn.Linear(input_d, H),
+          torch.nn.ReLU(),
+          torch.nn.Linear(H, H),
+          torch.nn.ReLU(),
+          torch.nn.Linear(H, H),
+          torch.nn.ReLU(),
+          torch.nn.Linear(H, output_d),
+
+TotalFrames = 370738, AvgFramesPerTrial = 370.4, AvgFramesPerGoal = 124.5
+Trials             : 1001
+Goals              : 217
+Defense Captured   : 71
+Balls Out of Bounds: 60
+Out of Time        : 653
+
+// atrood, kad daznai tiesiog bando spirt, nors neturi kamuolio

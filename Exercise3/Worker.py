@@ -10,22 +10,31 @@ from Policy import Policy
 import random
 from collections import deque
 import numpy as np
+from Environment import HFOEnv
 
 import os
 
 policy = Policy()
+
+def create_environment(idx):
+    port = 6000 + idx * 4
+    rnd_seed = 11111 * idx + 111
+    environment = HFOEnv(port=port, seed=rnd_seed, numOpponents=1)
+    environment.connectToServer()
+    return environment
 
 def increment_counter(counter):
 	with counter.get_lock():
 		counter.value += 1
 		return counter.value
 
-def train(idx, networks, optimizer, counter, environment, policy, config):
+def train(idx, networks, optimizer, counter, policy, config, logger):
+	environment = create_environment(idx)
 
 	counterValue = 0
 	for i in range(config["numEpisodes"]):
-		print("\nEpisode {0}/{1}\n".format(i, config["numEpisodes"]))
-		print("Counter: {0}".format(counterValue))
+		logger.log("Episode {0}/{1}, for process: {2}".format(i, config["numEpisodes"], idx))
+		logger.log("Counter: {0}".format(counterValue))
 
 		experienceQueue = deque([])
 		# gal dar kažką reik resetint?
@@ -57,7 +66,7 @@ def train(idx, networks, optimizer, counter, environment, policy, config):
 				networks["target"].load_state_dict(networks["learning"].state_dict())
 
 			if counterValue % config["parameter_save_frequency"] == 0:
-				print("Saving target network, counter: {0}".format(counterValue))
+				logger.log("Saving target network, counter: {0}".format(counterValue))
 				saveModelNetwork(networks["target"], 
 					config["parameterStoragePath"] + str(counterValue // config["parameter_save_frequency"]) + ".out")
 
@@ -67,7 +76,7 @@ def train(idx, networks, optimizer, counter, environment, policy, config):
 
 	# save the final model weights
 	if idx == 0:	# check the id so that only 1 worker would perform the saving
-		print("Saving final target network, counter: {0}".format(counterValue))
+		logger.log("Saving final target network, counter: {0}".format(counterValue))
 		saveModelNetwork(networks["target"], 
 			config["parameterStoragePath"] + str(counterValue // config["parameter_save_frequency"]) + ".out")
 

@@ -1,8 +1,0 @@
-Random agent statistics (1000 episodes):
-
-TotalFrames = 144296, AvgFramesPerTrial = 144.2, AvgFramesPerGoal = 171.4
-Trials             : 1001
-Goals              : 593
-Defense Captured   : 95
-Balls Out of Bounds: 312
-Out of Time        : 1

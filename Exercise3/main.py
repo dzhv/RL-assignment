@@ -4,6 +4,7 @@
 
 import os
 import worker_factory
+from logger import Logger
 
 os.environ['OMP_NUM_THREADS'] = '1'
 
@@ -13,7 +14,10 @@ os.environ['OMP_NUM_THREADS'] = '1'
 # your models, torch's multiprocessing methods, etc.
 if __name__ == "__main__" :
 
-	experiment_name = "first"
+	logger = Logger("output.out")
+
+	experiment_name = "test"
+	logger.log("Starting experiment: {0}".format(experiment_name))
 	os.system("mkdir model_weights/{0}".format(experiment_name))
 
 	config = {
@@ -27,7 +31,8 @@ if __name__ == "__main__" :
 		"parameter_save_frequency": 1000000,
 		"numEpisodes": 8000,
 	}
-	workers = worker_factory.create_workers(config)
+	workers = worker_factory.create_workers(config, logger)
+	logger.log("running {0} workers".format(len(workers)))
 	for w in workers:
 		w.join()
 

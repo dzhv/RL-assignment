@@ -5,36 +5,34 @@ from Policy import Policy
 from SharedAdam import SharedAdam
 from Environment import HFOEnv
 
-def create_environment(idx):
-    port = 6000 + idx
-    rnd_seed = 11111 * idx + 111
-    environment = HFOEnv(port=port, seed=rnd_seed, numOpponents=1)
-    environment.connectToServer()
-    return environment
-
-def create_workers(config):
+def create_workers(config, logger):
     counter = mp.Value('i', 0)
-    # lock = mp.Lock()
     
     learning_network = network_factory.create_network()
     target_network = network_factory.create_network()
-    learning_network.load_state_dict(target_network.state_dict())
+    learning_network.load_state_dict(target_network.state_dict())    
 
     optimizer = SharedAdam(learning_network.parameters(), lr=config["learning_rate"])
     optimizer.share_memory()
 
-    workers = []
+    workers = []    
     for idx in range(0, config["n_workers"]):
         networks = {
             "learning": learning_network,
             "target": target_network 
         }
 
-        environment = create_environment(idx)
+        # environment = create_environment(idx)
         policy = Policy(epsilon=config["epsilons"][idx])
-        trainingArgs = (idx, networks, optimizer, counter, environment, policy, config)
+        trainingArgs = (idx, networks, optimizer, counter, policy, config, logger)
         p = mp.Process(target=Worker.train, args=trainingArgs)
-        p.start()
+
+        logger.log("Starting process: {0}".format(idx))
+
+        p.start()        
+
+        logger.log("Process started: {0}".format(idx))
         workers.append(p)
+        logger.log("Worker Appended: {0}".format(idx))
     
     return workers

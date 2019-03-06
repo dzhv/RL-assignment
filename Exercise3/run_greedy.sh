@@ -1,2 +1,2 @@
 killall -9 rcssserver
-python greedy.py
+python agent_greedy.py

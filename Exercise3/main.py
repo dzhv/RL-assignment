@@ -17,14 +17,14 @@ if __name__ == "__main__" :
 
 	logger = Logger("output.out")
 
-	experiment_name = "test"
+	experiment_name = "exp2"
 	logger.log("Starting experiment: {0}".format(experiment_name))
 	os.system("mkdir model_weights/{0}".format(experiment_name))
 
 	config = {
-		"n_workers": 8,#8,
-		"startingEpsilons": [1, 1, 0.8, 0.8, 0.5, 0.5, 0.3, 0.3],
-		"minEpsilons": [0.25, 0.2, 0.15, 0.125, 0.1, 0.1, 0.05, 0],
+		"n_workers": 5,#8,
+		"startingEpsilons": [1, 0.8, 0.5, 0.3, 0.1],
+		"minEpsilons": [0.25, 0.2, 0.1, 0.1, 0.05],
 		"numPolicyUpdates": 3500,
 		"discountFactor": 0.99,
 		"learning_rate": 1e-4,
@@ -32,7 +32,7 @@ if __name__ == "__main__" :
 		"target_network_update_interval": 200,
 		"parameterStoragePath": "model_weights/{0}/weights_".format(experiment_name),
 		"parameter_save_frequency": 1000000,
-		"numEpisodes": 5000,
+		"numEpisodes": 4000,
 	}
 	workers, target_network = worker_factory.create_workers(config, logger)
 	logger.log("running {0} workers".format(len(workers)))

@@ -1,6 +1,8 @@
-def run(num_episodes, value_network, environment, policy):
+from Worker import *
+
+def run(num_episodes, value_network, environment, policy, logger):
 	for i in range(num_episodes):
-		print("\nEpisode {0}/{1}\n".format(i, num_episodes))
+		logger.log("\nEpisode {0}/{1}\n".format(i, num_episodes))
 		environment.reset()
 
 		while True:

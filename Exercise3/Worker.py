@@ -97,8 +97,6 @@ def computePrediction(state, action, valueNetwork):
 
 	action_tensor = one_hot_encode(action)
 	model_input = torch.cat((state, action_tensor))
-
-	print(model_input)
 	
 	return valueNetwork(model_input)
 	

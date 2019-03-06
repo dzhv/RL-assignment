@@ -7,6 +7,7 @@ from Environment import HFOEnv
 import network_factory
 import torch
 from Policy import Policy
+from logger import Logger
 
 os.environ['OMP_NUM_THREADS'] = '1'
 
@@ -17,14 +18,17 @@ os.environ['OMP_NUM_THREADS'] = '1'
 if __name__ == "__main__" :
 	
 	value_network = network_factory.create_network()
-	weights_path = "model_weights/first_parallel/weights_5.out"
+	weights_path = "model_weights/exp1/weights_final.out"
 	value_network.load_state_dict(torch.load(weights_path))
+
+	logger = Logger("output.out")
 
 	rnd_seed = 11111 + 111
 	environment = HFOEnv(port=6011, seed=rnd_seed, numOpponents=1)
 	environment.connectToServer()
 
-	policy_worker.run(num_episodes=1000, value_network=value_network, environment=environment, policy=Policy())
+	policy_worker.run(num_episodes=1000, value_network=value_network, 
+		environment=environment, policy=Policy(logger=logger), logger=logger)
 
 	environment.quitGame()
 

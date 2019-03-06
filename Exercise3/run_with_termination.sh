@@ -2,4 +2,4 @@
 
 sleep 100
 
-shutdown -h now
+sudo shutdown -h now

@@ -38,7 +38,7 @@ class Policy():
 		return self.greedyAction(state, valueNetwork, computePrediction)
 
 	def updateEpsilon(self):
-		self.logger.log("Updating epsilon from: {0}".format(self.epsilon))		
+		# self.logger.log("Updating epsilon from: {0}".format(self.epsilon))		
 
 		self.epsilon = self.initEpsilon - (float(self.currStep) / 
 			self.numUpdates * (self.initEpsilon - self.minEpsilon))
@@ -46,7 +46,7 @@ class Policy():
 
 		self.currStep += 1
 
-		self.logger.log("To: {0}".format(self.epsilon))
+		# self.logger.log("To: {0}".format(self.epsilon))
 
 class RandomPolicy():
 	def __init__(self, epsilon=1):

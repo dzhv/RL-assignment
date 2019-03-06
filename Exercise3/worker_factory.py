@@ -4,6 +4,8 @@ import Worker
 from Policy import Policy
 from SharedAdam import SharedAdam
 from Environment import HFOEnv
+import policy_worker
+from logger import Logger
 
 def create_workers(config, logger):
     counter = mp.Value('i', 0)
@@ -34,6 +36,20 @@ def create_workers(config, logger):
 
         logger.log("Process started: {0}".format(idx))
         workers.append(p)
-        logger.log("Worker Appended: {0}".format(idx))
+        logger.log("Worker Appended: {0}".format(idx))    
+
+    logger.log("Creating the greedy worker")    
+    p = create_greedy_worker(learning_network, counter)
+    p.start()
+    workers.append(p)
+    logger.log("Greedy worker started and appended")
     
     return workers, target_network
+
+def create_greedy_worker(learning_network, counter):
+    logger = Logger("output_greedy.out")
+    environment = HFOEnv(port=6321, seed=86868686, numOpponents=1)
+    environment.connectToServer()
+
+    w_args = (100000, learning_network, environment, Policy(logger=logger), logger, counter)
+    return mp.Process(target=policy_worker.run, args=w_args)

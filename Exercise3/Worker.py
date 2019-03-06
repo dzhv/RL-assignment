@@ -69,6 +69,8 @@ def train(idx, networks, optimizer, counter, policy, config, logger):
 				# use q_value instead of "computePrediction"
 				# grid search learning rate ir discount factor
 
+				for param in networks["learning"].parameters():
+					param.grad.data.clamp_(-config["max_grads"], config["max_grads"])
 
 				optimizer.step()			
 
@@ -76,8 +78,8 @@ def train(idx, networks, optimizer, counter, policy, config, logger):
 				networks["target"].load_state_dict(networks["learning"].state_dict())
 
 			if counterValue % config["parameter_save_frequency"] == 0:
-				logger.log("Saving target network, counter: {0}".format(counterValue))
-				saveModelNetwork(networks["target"], 
+				logger.log("Saving value network, counter: {0}".format(counterValue))
+				saveModelNetwork(networks["value"], 
 					config["parameterStoragePath"] + str(counterValue // config["parameter_save_frequency"]) + ".out")
 
 			if done:
@@ -95,10 +97,10 @@ def computeTargets(reward, nextObservation, discountFactor, done, targetNetwork)
 def computePrediction(state, action, valueNetwork):	
 	state = state.view(-1)
 
-	action_tensor = one_hot_encode(action)
-	model_input = torch.cat((state, action_tensor))
+	# action_tensor = one_hot_encode(action)
+	# model_input = torch.cat((state, action_tensor))
 	
-	return valueNetwork(model_input)
+	return valueNetwork(state)[action]
 	
 # Function to save parameters of a neural network in pytorch.
 def saveModelNetwork(model, strDirectory):

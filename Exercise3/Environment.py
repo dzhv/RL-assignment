@@ -116,10 +116,10 @@ class HFOEnv(object):
 			reward = 1
 			info = { "reason": "GOAL" }
 		elif status == CAPTURED_BY_DEFENSE:
-			reward = -0.5
+			reward = -0.1
 			info = { "reason": "CAPTURED_BY_DEFENSE" }
 		elif status == OUT_OF_BOUNDS:
-			reward = -0.5
+			reward = -0.2
 			info = { "reason": "Out of bounds" }
 		else:
 			info = { "reason": "Nothing happened"}

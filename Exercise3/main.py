@@ -17,17 +17,17 @@ if __name__ == "__main__" :
 
 	logger = Logger("output.out")
 
-	experiment_name = "exp3"
+	experiment_name = "exp4"
 	logger.log("Starting experiment: {0}".format(experiment_name))
 	os.system("mkdir model_weights/{0}".format(experiment_name))
 
 	config = {
 		"n_workers": 5,
-		"startingEpsilons": [1, 0.8, 0.5, 0.3, 0.1],
-		"minEpsilons": [0.25, 0.2, 0.1, 0.1, 0.05],
+		"startingEpsilons": [1, 0.75, 0.5, 0.25, 0.1],
+		"minEpsilons": [1, 0.75, 0.5, 0.25, 0],
 		"numPolicyUpdates": 3000,
 		"discountFactor": 0.99,
-		"learning_rate": 1e-4,
+		"learning_rate": 5e-5,
 		"learning_network_update_interval": 6,
 		"target_network_update_interval": 200,
 		"parameterStoragePath": "model_weights/{0}/weights_".format(experiment_name),

@@ -17,7 +17,7 @@ if __name__ == "__main__" :
 
 	logger = Logger("output.out")
 
-	experiment_name = "exp4"
+	experiment_name = "exp5"
 	logger.log("Starting experiment: {0}".format(experiment_name))
 	os.system("mkdir model_weights/{0}".format(experiment_name))
 

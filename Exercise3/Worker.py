@@ -63,8 +63,7 @@ def train(idx, networks, optimizer, counter, policy, config, logger):
 
 				# logger.log("Random gradients:")
 				# logger.log(str(networks["learning"].model[2].weight.grad))
-								
-				# normalize gradients?
+												
 				# use 3rd NN
 				# use q_value instead of "computePrediction"
 				# grid search learning rate ir discount factor

@@ -33,10 +33,10 @@ class HFOEnv(object):
 	# Method to initialize the server for HFO environment
 	def startEnv(self):
 		if self.numTeammates == 0:
-			os.system("./../../../bin/HFO --seed {} --defense-npcs=0 --headless --defense-agents={} --offense-agents=1 --trials 8000 --untouched-time 500 --frames-per-trial 500 --port {} --fullstate &".format(str(self.seed),
+			os.system("./../../../bin/HFO --seed {} --defense-npcs=0 --headless --defense-agents={} --offense-agents=1 --trials 12000 --untouched-time 500 --frames-per-trial 500 --port {} --fullstate &".format(str(self.seed),
 				str(self.numOpponents), str(self.port)))
 		else :
-			os.system("./../../../bin/HFO --seed {} --defense-agents={} --defense-npcs=0 --offense-npcs={} --offense-agents=1 --trials 8000 --untouched-time 500 --frames-per-trial 500 --port {} --fullstate &".format(
+			os.system("./../../../bin/HFO --seed {} --defense-agents={} --defense-npcs=0 --offense-npcs={} --offense-agents=1 --trials 12000 --untouched-time 500 --frames-per-trial 500 --port {} --fullstate &".format(
 				str(self.seed), str(self.numOpponents), str(self.numTeammates), str(self.port)))
 		time.sleep(5)
 

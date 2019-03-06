@@ -54,7 +54,7 @@ class HFOEnv(object):
 	def connectToServer(self):
 		os.system("./Goalkeeper.py --numEpisodes=8000 --port={} &".format(str(self.port)))
 		time.sleep(2)
-		self.hfo.connectToServer(LOW_LEVEL_FEATURE_SET,self.config_dir,self.port,self.server_addr,self.team_name,self.play_goalie)
+		self.hfo.connectToServer(HIGH_LEVEL_FEATURE_SET,self.config_dir,self.port,self.server_addr,self.team_name,self.play_goalie)
 
 	# This method computes the resulting status and states after an agent decides to take an action
 	def act(self, actionString):
@@ -99,6 +99,13 @@ class HFOEnv(object):
 	# You might also give extra information on the name of each rewards
 	# for monitoring purposes.
 	def get_reward(self, status, nextState):
+		# print("Current State, shape: {0}".format(self.curState.shape))
+		# print(self.curState)
+		# print("next State")
+		# print(nextState)
+
+
+
 		reward = 0.0
 		info = {}
 		# print("GOAL value: {0}".format(GOAL))    ==  1		
@@ -109,7 +116,7 @@ class HFOEnv(object):
 			reward = 1
 			info = { "reason": "GOAL" }
 		elif status == CAPTURED_BY_DEFENSE:
-			reward = -1
+			reward = -0.5
 			info = { "reason": "CAPTURED_BY_DEFENSE" }
 		elif status == OUT_OF_BOUNDS:
 			reward = -0.5

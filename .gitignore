@@ -1,3 +1,5 @@
 **/__pycache__/*
 **/.DS_Store
 **/log/*
+Exercise3/output.out
+Exercise3/model_weights/test/*

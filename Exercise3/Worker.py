@@ -40,12 +40,13 @@ def train(idx, networks, optimizer, counter, policy, config, logger):
 		# gal dar kažką reik resetint?
 		# kokius gradient, optimizer ka nors
 		environment.reset()
+		policy.updateEpsilon()
 
 		while True:
 			counterValue = increment_counter(counter)
 
 			state = environment.curState
-			action, q_value = policy.egreedyAction(state, networks["target"], computePrediction)
+			action, q_value = policy.egreedyAction(state, networks["learning"], computePrediction)
 			nextState, reward, done, status, info = environment.step(environment.possibleActions[action])
 			experienceQueue.append((state, action, reward, q_value, nextState))
 
@@ -57,9 +58,18 @@ def train(idx, networks, optimizer, counter, policy, config, logger):
 					target = computeTargets(reward, nextState, config["discountFactor"], done, networks["target"])
 					loss += (target - computePrediction(state, action, networks["learning"]))**2
 
-				optimizer.zero_grad()	
+				optimizer.zero_grad()
 				loss.backward()
-				
+
+				# logger.log("Random gradients:")
+				# logger.log(str(networks["learning"].model[2].weight.grad))
+								
+				# normalize gradients?
+				# use 3rd NN
+				# use q_value instead of "computePrediction"
+				# grid search learning rate ir discount factor
+
+
 				optimizer.step()			
 
 			if counterValue % config["target_network_update_interval"] == 0:
@@ -71,14 +81,7 @@ def train(idx, networks, optimizer, counter, policy, config, logger):
 					config["parameterStoragePath"] + str(counterValue // config["parameter_save_frequency"]) + ".out")
 
 			if done:
-				break
-
-
-	# save the final model weights
-	if idx == 0:	# check the id so that only 1 worker would perform the saving
-		logger.log("Saving final target network, counter: {0}".format(counterValue))
-		saveModelNetwork(networks["target"], 
-			config["parameterStoragePath"] + str(counterValue // config["parameter_save_frequency"]) + ".out")
+				break	
 
 def computeTargets(reward, nextObservation, discountFactor, done, targetNetwork):
 	nextObservation = nextObservation.view(-1)
@@ -94,6 +97,8 @@ def computePrediction(state, action, valueNetwork):
 
 	action_tensor = one_hot_encode(action)
 	model_input = torch.cat((state, action_tensor))
+
+	print(model_input)
 	
 	return valueNetwork(model_input)
 	

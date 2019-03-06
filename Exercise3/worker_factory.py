@@ -15,7 +15,7 @@ def create_workers(config, logger):
     optimizer = SharedAdam(learning_network.parameters(), lr=config["learning_rate"])
     optimizer.share_memory()
 
-    workers = []    
+    workers = []
     for idx in range(0, config["n_workers"]):
         networks = {
             "learning": learning_network,
@@ -23,7 +23,8 @@ def create_workers(config, logger):
         }
 
         # environment = create_environment(idx)
-        policy = Policy(epsilon=config["epsilons"][idx])
+        policy = Policy(epsilon=config["startingEpsilons"][idx], 
+            numUpdates=config["numPolicyUpdates"], minEpsilon=config["minEpsilons"][idx], logger=logger)
         trainingArgs = (idx, networks, optimizer, counter, policy, config, logger)
         p = mp.Process(target=Worker.train, args=trainingArgs)
 
@@ -35,4 +36,4 @@ def create_workers(config, logger):
         workers.append(p)
         logger.log("Worker Appended: {0}".format(idx))
     
-    return workers
+    return workers, target_network

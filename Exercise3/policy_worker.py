@@ -1,9 +1,4 @@
-from Worker import computePrediction
-from Policy import Policy
-
-def run(num_episodes, value_network, environment):
-	policy = Policy()
-
+def run(num_episodes, value_network, environment, policy):
 	for i in range(num_episodes):
 		print("\nEpisode {0}/{1}\n".format(i, num_episodes))
 		environment.reset()

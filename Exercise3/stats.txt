@@ -29,3 +29,14 @@ Balls Out of Bounds: 60
 Out of Time        : 653
 
 // atrood, kad daznai tiesiog bando spirt, nors neturi kamuolio
+
+Model after 5000 000 traning steps
+	with the same linear model, and 5 parallel agents:
+	"epsilons": [1, 0.75, 0.5, 0.25, 0],
+		
+TotalFrames = 333825, AvgFramesPerTrial = 333.5, AvgFramesPerGoal = 153.1
+Trials             : 1001
+Goals              : 368
+Defense Captured   : 81
+Balls Out of Bounds: 39
+Out of Time        : 513

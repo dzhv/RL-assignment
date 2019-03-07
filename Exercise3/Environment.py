@@ -52,7 +52,7 @@ class HFOEnv(object):
 	# Connect the custom weaker goalkeeper to the server and 
 	# establish agent's connection with HFO server
 	def connectToServer(self):
-		os.system("./Goalkeeper.py --numEpisodes=8000 --port={} &".format(str(self.port)))
+		os.system("./Goalkeeper.py --numEpisodes=12000 --port={} &".format(str(self.port)))
 		time.sleep(2)
 		self.hfo.connectToServer(LOW_LEVEL_FEATURE_SET,self.config_dir,self.port,self.server_addr,self.team_name,self.play_goalie)
 

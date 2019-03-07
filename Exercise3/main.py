@@ -32,7 +32,7 @@ if __name__ == "__main__" :
 		"target_network_update_interval": 200,
 		"parameterStoragePath": "model_weights/{0}/weights_".format(experiment_name),
 		"max_grads": 1,
-		"parameter_save_frequency": 2,
+		"parameter_save_frequency": 1000000,
 		"numEpisodes": 6000,
 	}
 	workers, target_network = worker_factory.create_workers(config, logger)

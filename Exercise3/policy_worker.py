@@ -29,7 +29,7 @@ def run(num_episodes, value_network, environment, policy, logger, counter):
 			else:
 				counter_checks = 1
 
-			if counter_checks > 14:
+			if counter_checks > 30:
 				logger.log("seems like everyone else has stopped")
 				logger.log("stopping")
 				break

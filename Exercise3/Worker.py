@@ -78,7 +78,7 @@ def train(idx, networks, optimizer, counter, policy, config, logger):
 
 			if counterValue % config["parameter_save_frequency"] == 0:
 				logger.log("Saving value network, counter: {0}".format(counterValue))
-				saveModelNetwork(networks["value"], 
+				saveModelNetwork(networks["learning"], 
 					config["parameterStoragePath"] + str(counterValue // config["parameter_save_frequency"]) + ".out")
 
 			if done:

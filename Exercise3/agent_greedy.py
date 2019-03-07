@@ -18,7 +18,7 @@ os.environ['OMP_NUM_THREADS'] = '1'
 if __name__ == "__main__" :
 	
 	value_network = network_factory.create_network()
-	weights_path = "model_weights/exp1/weights_final.out"
+	weights_path = "model_weights/exp7/weights_final.out"
 	value_network.load_state_dict(torch.load(weights_path))
 
 	logger = Logger("output.out")
@@ -28,7 +28,7 @@ if __name__ == "__main__" :
 	environment.connectToServer()
 
 	policy_worker.run(num_episodes=1000, value_network=value_network, 
-		environment=environment, policy=Policy(logger=logger), logger=logger)
+		environment=environment, policy=Policy(logger=logger), logger=logger, counter=None)
 
 	environment.quitGame()
 

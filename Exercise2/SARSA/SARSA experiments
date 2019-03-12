@@ -6,3 +6,9 @@ decay_constant = 0.003
 65 GOALS, 500 Episodes
 
 -----
+
+(learningRate, discountFactor, epsilon)
+agent = SARSAAgent(0.1, 0.99, 1)
+decay_constant = 0.0006
+
+around 79, 75, 83, 87  goals from 4500

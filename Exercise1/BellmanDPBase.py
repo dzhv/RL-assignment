@@ -37,7 +37,7 @@ class BellmanDPSolver(object):
 
 		max_return = None
 		best_actions = []
-		for action in self.MDP.A:  # is every action possible any time?
+		for action in self.MDP.A:
 			# get expected return for the action
 			a_return = self.action_return(state, action)
 			if max_return is None or max_return < a_return:
@@ -54,7 +54,7 @@ class BellmanDPSolver(object):
 			self.policy[state], self.Vs[state] = self.max_action_return(state)
 
 		return self.Vs, self.policy
-		
+
 		
 if __name__ == '__main__':
 	solution = BellmanDPSolver(1)
@@ -62,4 +62,3 @@ if __name__ == '__main__':
 		values, policy = solution.BellmanUpdate()
 	print("Values : ", values, "\n")	
 	print("Policy : ", policy)
-

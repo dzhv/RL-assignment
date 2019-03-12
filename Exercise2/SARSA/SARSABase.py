@@ -11,11 +11,11 @@ class SARSAAgent(Agent):
 	def __init__(self, learningRate, discountFactor, epsilon, initVals=0.0):
 		super(SARSAAgent, self).__init__()
 
-		self.initLearningRate = learningRate
+		self.initLearningRate = 0.1
 		self.setLearningRate(learningRate)
-		self.initEpsilon = epsilon
+		self.initEpsilon = 1
 		self.setEpsilon(epsilon)
-		self.discountFactor = discountFactor
+		self.discountFactor = 0.99
 
 		# dictionary with automatically assigned default value for a new key
 		self.Q = defaultdict(lambda: initVals)
@@ -72,13 +72,13 @@ class SARSAAgent(Agent):
 		target = prevReward + self.discountFactor * nextQValue
 		self.Q[prevKey] = initialQVal + self.currLearningRate * (target - initialQVal)
 
-		print("Prev state: {0}".format(prevState))
-		print("Prev reward: {0}".format(prevReward))
-		print("Prev action: {0}".format(prevAction))
-		print("Current state: {0}".format(currState))
-		print("Current reward: {0}".format(currReward))
-		print("Current action: {0}".format(currAction))
-		print("Update: {0} -> {1}".format(initialQVal, self.Q[prevKey]))
+		# print("Prev state: {0}".format(prevState))
+		# print("Prev reward: {0}".format(prevReward))
+		# print("Prev action: {0}".format(prevAction))
+		# print("Current state: {0}".format(currState))
+		# print("Current reward: {0}".format(currReward))
+		# print("Current action: {0}".format(currAction))
+		# print("Update: {0} -> {1}".format(initialQVal, self.Q[prevKey]))
 
 		return self.Q[prevKey] - initialQVal
 
@@ -98,7 +98,8 @@ class SARSAAgent(Agent):
 		self.experienceQueue.clear()
 
 	def computeHyperparameters(self, numTakenActions, episode):
-		decay_constant = 0.0035
+
+		decay_constant = 0.0006
 		e = 2.718
 
 		factor = e ** (- decay_constant * episode)
@@ -135,6 +136,7 @@ if __name__ == '__main__':
 
 	# Run training using SARSA
 	numTakenActions = 0 
+	goals = 0
 	for episode in range(numEpisodes):
 		print("EPISODE: {0}/{1}".format(episode, numEpisodes))
 
@@ -145,6 +147,10 @@ if __name__ == '__main__':
 		nextObservation = None
 		epsStart = True
 
+
+		if episode % 100 == 0:
+			print("Goals last 100 episodes: {0}".format(goals))
+			goals = 0
 		while status==0:
 			learningRate, epsilon = agent.computeHyperparameters(numTakenActions, episode)
 			agent.setEpsilon(epsilon)
@@ -156,7 +162,10 @@ if __name__ == '__main__':
 			numTakenActions += 1
 
 			nextObservation, reward, done, status = hfoEnv.step(action)
-			print(obsCopy, action, reward, nextObservation)
+
+			if reward > 0:
+				goals += 1
+			# print(obsCopy, action, reward, nextObservation)
 			agent.setExperience(agent.toStateRepresentation(obsCopy), action, reward, status,
 				agent.toStateRepresentation(nextObservation))
 			
@@ -170,6 +179,6 @@ if __name__ == '__main__':
 		agent.setExperience(agent.toStateRepresentation(nextObservation), None, None, None, None)
 		agent.learn()
 
-	print(agent.Q)
+	# print(agent.Q)
 
 	

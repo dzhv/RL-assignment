@@ -72,14 +72,6 @@ class SARSAAgent(Agent):
 		target = prevReward + self.discountFactor * nextQValue
 		self.Q[prevKey] = initialQVal + self.currLearningRate * (target - initialQVal)
 
-		# print("Prev state: {0}".format(prevState))
-		# print("Prev reward: {0}".format(prevReward))
-		# print("Prev action: {0}".format(prevAction))
-		# print("Current state: {0}".format(currState))
-		# print("Current reward: {0}".format(currReward))
-		# print("Current action: {0}".format(currAction))
-		# print("Update: {0} -> {1}".format(initialQVal, self.Q[prevKey]))
-
 		return self.Q[prevKey] - initialQVal
 
 	def act(self):
@@ -165,7 +157,7 @@ if __name__ == '__main__':
 
 			if reward > 0:
 				goals += 1
-			# print(obsCopy, action, reward, nextObservation)
+			
 			agent.setExperience(agent.toStateRepresentation(obsCopy), action, reward, status,
 				agent.toStateRepresentation(nextObservation))
 			

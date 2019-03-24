@@ -22,7 +22,7 @@ if __name__ == "__main__" :
 	os.system("mkdir model_weights/{0}".format(experiment_name))
 
 	config = {
-		"n_workers": 6,
+		"n_workers": 1,
 		"startingEpsilons": [1, 0.8, 0.5, 0.5, 0.3, 0.1],
 		"minEpsilons": [0.4, 0.35, 0.25, 0.25, 0.15, 0],
 		"numPolicyUpdates": 5000,
@@ -33,7 +33,7 @@ if __name__ == "__main__" :
 		"parameterStoragePath": "model_weights/{0}/weights_".format(experiment_name),
 		"max_grads": 1,
 		"parameter_save_frequency": 1000000,
-		"numEpisodes": 6000,
+		"numEpisodes": 15,
 	}
 	workers, target_network = worker_factory.create_workers(config, logger)
 	logger.log("running {0} workers".format(len(workers)))

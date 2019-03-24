@@ -62,7 +62,7 @@ def train(idx, networks, optimizer, counter, policy, config, logger):
 				loss.backward()
 
 				# logger.log("Random gradients:")
-				# logger.log(str(networks["learning"].model[2].weight.grad))
+				logger.log(str(networks["learning"].model[2].weight))
 												
 				# use 3rd NN
 				# use q_value instead of "computePrediction"

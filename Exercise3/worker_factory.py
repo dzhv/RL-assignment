@@ -39,17 +39,17 @@ def create_workers(config, logger):
         logger.log("Worker Appended: {0}".format(idx))    
 
     logger.log("Creating the greedy worker")    
-    p = create_greedy_worker(learning_network, counter)
+    p = create_greedy_worker(networks, counter)
     p.start()
     workers.append(p)
     logger.log("Greedy worker started and appended")
     
     return workers, target_network
 
-def create_greedy_worker(learning_network, counter):
+def create_greedy_worker(networks, counter):
     logger = Logger("output_greedy.out")
     environment = HFOEnv(port=6321, seed=86868686, numOpponents=1)
     environment.connectToServer()
 
-    w_args = (100000, learning_network, environment, Policy(logger=logger), logger, counter)
+    w_args = (100000, networks, environment, Policy(logger=logger), logger, counter)
     return mp.Process(target=policy_worker.run, args=w_args)

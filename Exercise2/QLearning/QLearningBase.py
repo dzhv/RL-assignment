@@ -11,11 +11,11 @@ class QLearningAgent(Agent):
 	def __init__(self, learningRate, discountFactor, epsilon, initVals=0.0):
 		super(QLearningAgent, self).__init__()
 		
-		self.initLearningRate = learningRate
+		self.initLearningRate = 0.1
 		self.setLearningRate(learningRate)
-		self.initEpsilon = epsilon
+		self.initEpsilon = 1
 		self.setEpsilon(epsilon)
-		self.discountFactor = discountFactor
+		self.discountFactor = 0.99
 
 		# dictionary with automatically assigned default value for a new key
 		self.Q = defaultdict(lambda: initVals)
@@ -72,11 +72,11 @@ class QLearningAgent(Agent):
 		self.Q[Qkey] = initialQVal + self.currLearningRate * (target - initialQVal)
 
 
-		print("Current state: {0}".format(self.currState))
-		print("Taken action: {0}".format(self.action))		
-		print("Next state: {0}".format(self.nextState))
-		print("Reward: {0}".format(self.reward))
-		print("Update: {0} -> {1}".format(initialQVal, self.Q[Qkey]))
+		# print("Current state: {0}".format(self.currState))
+		# print("Taken action: {0}".format(self.action))		
+		# print("Next state: {0}".format(self.nextState))
+		# print("Reward: {0}".format(self.reward))
+		# print("Update: {0} -> {1}".format(initialQVal, self.Q[Qkey]))
 
 		return self.Q[Qkey] - initialQVal
 
@@ -106,12 +106,12 @@ class QLearningAgent(Agent):
 		
 	def computeHyperparameters(self, numTakenActions, episodeNumber):
 		# exponential decay
-		decay_constant = 0.0035
+		decay_constant = 0.0006
 		e = 2.718
 
 		factor = e ** (- decay_constant * episode)
 
-		learningRate = self.initLearningRate * factor
+		learningRate = self.initLearningRate# * factor
 		epsilon = self.initEpsilon * factor
 
 		return learningRate, epsilon
@@ -137,12 +137,16 @@ if __name__ == '__main__':
 
 	# Run training using Q-Learning
 	numTakenActions = 0 
+	goals = 0
 	for episode in range(numEpisodes):
 		print("EPISODE: {0}/{1}".format(episode, numEpisodes))
 
 		status = 0
 		observation = hfoEnv.reset()
 		
+		if episode % 100 == 0:
+			print("Goals last 100 episodes: {0}".format(goals))
+			goals = 0
 		while status==0:
 			learningRate, epsilon = agent.computeHyperparameters(numTakenActions, episode)
 			agent.setEpsilon(epsilon)
@@ -154,7 +158,10 @@ if __name__ == '__main__':
 			numTakenActions += 1
 			
 			nextObservation, reward, done, status = hfoEnv.step(action)
-			#print("REWARD: {0}".format(reward))
+
+			if reward > 0:
+				goals += 1
+				
 			agent.setExperience(agent.toStateRepresentation(obsCopy), action, reward, status, 
 				agent.toStateRepresentation(nextObservation))
 			update = agent.learn()

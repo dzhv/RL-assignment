@@ -36,7 +36,7 @@ class MonteCarloAgent(Agent):
 		return True 
 
 	def learn(self):
-		print("LEARNING:")
+		# print("LEARNING:")
 		G = 0
 		resultQueue = deque([])
 		while len(self.experienceQueue) > 0:
@@ -51,15 +51,15 @@ class MonteCarloAgent(Agent):
 			n = self.stateActionVisits[key]
 			self.stateActionVisits[key] += 1
 			
-			print("State: {0}, action: {1}, reward: {2}".format(state, action, reward))
-			print("Init key {0} value: {1}".format(key, self.Q[key]))
+			# print("State: {0}, action: {1}, reward: {2}".format(state, action, reward))
+			# print("Init key {0} value: {1}".format(key, self.Q[key]))
 			self.Q[key] = self.Q[key] * (n / (n+1)) + G / (n+1) 
-			print("Updated value: {0}".format(self.Q[key]))
+			# print("Updated value: {0}".format(self.Q[key]))
 			
 			resultQueue.appendleft(self.Q[key])
 
-		print("resultQueue")
-		print(resultQueue)
+		# print("resultQueue")
+		# print(resultQueue)
 		return self.Q, list(resultQueue)
 
 	def toStateRepresentation(self, state):

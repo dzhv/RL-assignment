@@ -29,9 +29,10 @@ decayConstant=0.0004, discountFactor=0.97, experiment='exp5', id=0, learningRate
 75 66 81 60 76
 
 -----
-decayConstant=0.0006, discountFactor=0.95, experiment='exp7', id=0, learningRate=0.1
+decayConstant=0.0006, discountFactor=0.95, experiment='exp7, exp9', id=0, learningRate=0.1
 
 83 83 80 78 88
+79 82 79 74 86
 
 -----
 decayConstant=0.0005, discountFactor=0.96, experiment='exp8', id=0, learningRate=0.1

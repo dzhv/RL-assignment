@@ -17,18 +17,15 @@ from logger import Logger
 
 
 class QLearningAgent(Agent):
-	def __init__(self, learningRate, discountFactor, epsilon, decay_constant, initVals=0.0):
+	def __init__(self, learningRate, discountFactor, epsilon, initVals=0.0):
 		super(QLearningAgent, self).__init__()
 		
-		self.initLearningRate = learningRate
+		self.initLearningRate = 0.1
 		self.setLearningRate(self.initLearningRate)
 		self.initEpsilon = 1
 		self.setEpsilon(self.initEpsilon)
-		self.discountFactor = discountFactor
-		self.decay_constant = decay_constant
-
-		# TODO: set lr, epsilon, df, decay_constant to hard-coded values
-		# remove decay_const from constructor
+		self.discountFactor = 0.95
+		self.decay_constant = 0.0006
 
 		# dictionary with automatically assigned default value for a new key
 		self.Q = defaultdict(lambda: initVals)
@@ -51,7 +48,6 @@ class QLearningAgent(Agent):
 		maxAction = None
 		for action in self.possibleActions:
 			QValue = self.Q[self.key(state, action)]
-			# should I worry about equal Q values?
 			if maxQ is None or QValue > maxQ:
 				maxQ = QValue
 				maxAction = action
@@ -75,21 +71,11 @@ class QLearningAgent(Agent):
 		return self.greedyAction(state)
 
 	def learn(self):
-
-		# pagalvot apie terminal state update visuose metoduose
-
 		Qkey = self.key(self.currState, self.action)
 		initialQVal = self.Q[Qkey]
 				
 		target = self.reward + self.discountFactor * self.maxQ(self.nextState)
 		self.Q[Qkey] = initialQVal + self.currLearningRate * (target - initialQVal)
-
-
-		# print("Current state: {0}".format(self.currState))
-		# print("Taken action: {0}".format(self.action))		
-		# print("Next state: {0}".format(self.nextState))
-		# print("Reward: {0}".format(self.reward))
-		# print("Update: {0} -> {1}".format(initialQVal, self.Q[Qkey]))
 
 		return self.Q[Qkey] - initialQVal
 

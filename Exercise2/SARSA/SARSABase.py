@@ -39,7 +39,6 @@ class SARSAAgent(Agent):
 		maxAction = None
 		for action in self.possibleActions:
 			QValue = self.Q[self.key(state, action)]
-			# should I worry about equal Q values?
 			if maxQ is None or QValue > maxQ:
 				maxQ = QValue
 				maxAction = action

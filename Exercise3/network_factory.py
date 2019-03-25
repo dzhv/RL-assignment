@@ -7,4 +7,6 @@ input_d = 68    # for Low Level Features with action
 actions_n = 4
 
 def create_network():
-	return ValueNetwork(input_d=input_d, output_d=actions_n)
+	network = ValueNetwork(input_d=input_d, output_d=actions_n)
+	network.share_memory()
+	return network

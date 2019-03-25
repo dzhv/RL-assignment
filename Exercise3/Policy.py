@@ -1,5 +1,5 @@
 import random
-
+import torch
 
 class Policy():
 	def __init__(self, epsilon=1, numUpdates=5000, minEpsilon=0.1, logger=None):
@@ -15,27 +15,19 @@ class Policy():
 		actionIndex = random.randint(0, len(self.possibleActions) - 1)
 		return actionIndex
 
-	def greedyAction(self, state, valueNetwork, computePrediction):
-		maxQ = None
-		maxAction = None
-		for action in range(len(self.possibleActions)):
-			QValue = computePrediction(state, action, valueNetwork)
-			# should I worry about equal Q values?
-			if maxQ is None or QValue > maxQ:
-				maxQ = QValue
-				maxAction = action
-
+	def greedyAction(self, predictions):
+		maxQ, maxAction = torch.max(predictions, 0)
 		return maxAction, maxQ
 
-	def egreedyAction(self, state, valueNetwork, computePrediction):
+	def egreedyAction(self, state, predictions):
 		# gives the next action in an epsilon-greedy fashion
 		explore = random.random() < self.epsilon
 		if explore:
 			action = self.randomAction()
-			prediction = computePrediction(state, action, valueNetwork)
+			prediction = predictions[action]
 			return action, prediction
 
-		return self.greedyAction(state, valueNetwork, computePrediction)
+		return self.greedyAction(predictions)
 
 	def updateEpsilon(self):
 		# self.logger.log("Updating epsilon from: {0}".format(self.epsilon))		

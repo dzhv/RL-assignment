@@ -10,7 +10,7 @@ def run(num_episodes, networks, environment, policy, logger, counter):
 
 		while True:
 			state = environment.curState
-			action, q_value = policy.greedyAction(state, networks["learning"], computePrediction)
+			action, q_value = policy.greedyAction(computePredictions(state, networks["learning"]))
 
 			# logger.log(str(networks["learning"].model[2].weight))
 

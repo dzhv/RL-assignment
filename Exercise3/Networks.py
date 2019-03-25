@@ -12,11 +12,9 @@ class ValueNetwork(nn.Module):
 	def __init__(self, input_d, output_d):
 		super(ValueNetwork, self).__init__()
 
-		H = 50
+		H = 25
 		self.model = torch.nn.Sequential(
           torch.nn.Linear(input_d, H),
-          torch.nn.ReLU(),
-          torch.nn.Linear(H, H),
           torch.nn.ReLU(),
           torch.nn.Linear(H, H),
           torch.nn.ReLU(),

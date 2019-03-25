@@ -46,14 +46,14 @@ def train(idx, networks, optimizer, counter, policy, config, logger):
 			counterValue = increment_counter(counter)
 
 			state = environment.curState
-			action, q_value = policy.egreedyAction(state, networks["learning"], computePrediction)
+			action, q_value = policy.egreedyAction(state, computePredictions(state, networks["learning"]))
 			nextState, reward, done, status, info = environment.step(environment.possibleActions[action])
-			experienceQueue.append((state, action, reward, q_value, nextState))
+			experienceQueue.append((state, action, reward, nextState))
 
 			if done or len(experienceQueue) >= config["learning_network_update_interval"]:
 				loss = 0 
 				for i in range(len(experienceQueue)):
-					state, action, reward, q_value, nextState = experienceQueue.popleft()
+					state, action, reward, nextState = experienceQueue.popleft()
 
 					target = computeTargets(reward, nextState, config["discountFactor"], done, networks["target"])
 					loss += (target - computePrediction(state, action, networks["learning"]))**2
@@ -62,14 +62,13 @@ def train(idx, networks, optimizer, counter, policy, config, logger):
 				loss.backward()
 
 				# logger.log("Random gradients:")
-				logger.log(str(networks["learning"].model[2].weight))
+				# logger.log(str(networks["learning"].model[2].weight))
 												
 				# use 3rd NN
 				# use q_value instead of "computePrediction"
 				# grid search learning rate ir discount factor
 
-				for param in networks["learning"].parameters():
-					param.grad.data.clamp_(-config["max_grads"], config["max_grads"])
+				nn.utils.clip_grad_norm_(networks["learning"].parameters(), max_norm=40)
 
 				optimizer.step()			
 
@@ -84,22 +83,22 @@ def train(idx, networks, optimizer, counter, policy, config, logger):
 			if done:
 				break	
 
+def computePredictions(state, network):
+	state = state.view(-1)
+	return network(state)
+
+def computePrediction(state, action, valueNetwork):
+	# return valueNetwork(state)[action]
+	return computePredictions(state, valueNetwork)[action]
+
 def computeTargets(reward, nextObservation, discountFactor, done, targetNetwork):
-	nextObservation = nextObservation.view(-1)
 	# get q value of the greedy action
 	if done:
-		return reward
+		return torch.Tensor([reward])
 
-	_, qmax = policy.greedyAction(nextObservation, targetNetwork, computePrediction)
+	predictions = computePredictions(nextObservation, targetNetwork)
+	_, qmax = policy.greedyAction(predictions)
 	return reward + discountFactor * qmax
-
-def computePrediction(state, action, valueNetwork):	
-	state = state.view(-1)
-
-	# action_tensor = one_hot_encode(action)
-	# model_input = torch.cat((state, action_tensor))
-	
-	return valueNetwork(state)[action]
 	
 # Function to save parameters of a neural network in pytorch.
 def saveModelNetwork(model, strDirectory):

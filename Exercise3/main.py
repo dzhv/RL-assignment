@@ -6,6 +6,7 @@ import os
 import worker_factory
 from logger import Logger
 import torch
+import argparse
 
 os.environ['OMP_NUM_THREADS'] = '1'
 
@@ -15,25 +16,36 @@ os.environ['OMP_NUM_THREADS'] = '1'
 # your models, torch's multiprocessing methods, etc.
 if __name__ == "__main__" :
 
-	logger = Logger("output.out")
+	parser = argparse.ArgumentParser()
+	parser.add_argument('--id', type=int, default=0)
+	parser.add_argument('--numEpisodes', type=int, default=10000)
+	parser.add_argument('--experiment', type=str, default="exp_test")
+	parser.add_argument('--lr', type=float, default=1e-4)
 
-	experiment_name = "exp7"
-	logger.log("Starting experiment: {0}".format(experiment_name))
-	os.system("mkdir model_weights/{0}".format(experiment_name))
+	args = parser.parse_args()
+	experiment = args.experiment
+
+	logger = Logger("output_{0}.out".format(experiment))	
+	
+	logger.log("Starting experiment: {0}".format(experiment))
+	logger.log(str(args))
+
+	os.system("mkdir model_weights/{0}".format(experiment))
 
 	config = {
-		"n_workers": 1,
+		"n_workers": 6,
 		"startingEpsilons": [1, 0.8, 0.5, 0.5, 0.3, 0.1],
 		"minEpsilons": [0.4, 0.35, 0.25, 0.25, 0.15, 0],
 		"numPolicyUpdates": 5000,
-		"discountFactor": 0.97,
-		"learning_rate": 5e-5,
+		"discountFactor": 0.99,
+		"learning_rate": args.lr,
 		"learning_network_update_interval": 6,
 		"target_network_update_interval": 200,
-		"parameterStoragePath": "model_weights/{0}/weights_".format(experiment_name),
+		"parameterStoragePath": "model_weights/{0}/weights_".format(experiment),
 		"max_grads": 1,
 		"parameter_save_frequency": 1000000,
-		"numEpisodes": 15,
+		"numEpisodes": args.numEpisodes,
+		"experiment": experiment
 	}
 	workers, target_network = worker_factory.create_workers(config, logger)
 	logger.log("running {0} workers".format(len(workers)))

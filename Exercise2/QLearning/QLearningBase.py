@@ -7,15 +7,28 @@ from collections import defaultdict
 import random
 import argparse
 
+import sys
+from os import path
+
+this_folder = path.dirname(path.abspath(__file__))
+sys.path.append( path.dirname(this_folder) )
+
+from logger import Logger
+
+
 class QLearningAgent(Agent):
-	def __init__(self, learningRate, discountFactor, epsilon, initVals=0.0):
+	def __init__(self, learningRate, discountFactor, epsilon, decay_constant, initVals=0.0):
 		super(QLearningAgent, self).__init__()
 		
-		self.initLearningRate = 0.1
+		self.initLearningRate = learningRate
 		self.setLearningRate(learningRate)
 		self.initEpsilon = 1
 		self.setEpsilon(epsilon)
-		self.discountFactor = 0.99
+		self.discountFactor = discountFactor
+		self.decay_constant = decay_constant
+
+		# TODO: set lr, epsilon, df, decay_constant to hard-coded values
+		# remove decay_const from constructor
 
 		# dictionary with automatically assigned default value for a new key
 		self.Q = defaultdict(lambda: initVals)
@@ -106,7 +119,7 @@ class QLearningAgent(Agent):
 		
 	def computeHyperparameters(self, numTakenActions, episodeNumber):
 		# exponential decay
-		decay_constant = 0.0006
+		decay_constant = self.decay_constant
 		e = 2.718
 
 		factor = e ** (- decay_constant * episode)
@@ -123,8 +136,17 @@ if __name__ == '__main__':
 	parser.add_argument('--numOpponents', type=int, default=0)
 	parser.add_argument('--numTeammates', type=int, default=0)
 	parser.add_argument('--numEpisodes', type=int, default=500)
+	parser.add_argument('--learningRate', type=float, default=0.1)
+	parser.add_argument('--discountFactor', type=float, default=0.1)
+	parser.add_argument('--decayConstant', type=float, default=0.0006)
+	parser.add_argument('--experiment', type=str, default="exp1")
 
 	args=parser.parse_args()
+
+	logger = Logger(path.join(this_folder, "output_{0}.out".format(args.experiment)))
+	logger.log(str(args))
+
+	print(args)
 
 	# Initialize connection with the HFO server
 	hfoEnv = HFOAttackingPlayer(numOpponents = args.numOpponents, numTeammates = args.numTeammates, 
@@ -132,7 +154,8 @@ if __name__ == '__main__':
 	hfoEnv.connectToServer()
 
 	# Initialize a Q-Learning Agent
-	agent = QLearningAgent(learningRate = 0.1, discountFactor = 0.99, epsilon = 1)
+	agent = QLearningAgent(learningRate=args.learningRate, discountFactor=args.discountFactor, 
+		epsilon=1, decay_constant=args.decayConstant)
 	numEpisodes = args.numEpisodes
 
 	# Run training using Q-Learning
@@ -145,7 +168,9 @@ if __name__ == '__main__':
 		observation = hfoEnv.reset()
 		
 		if episode % 100 == 0:
-			print("Goals last 100 episodes: {0}".format(goals))
+			msg = "Goals last 100 episodes: {0}".format(goals)
+			print(msg)
+			logger.log(msg)
 			goals = 0
 		while status==0:
 			learningRate, epsilon = agent.computeHyperparameters(numTakenActions, episode)

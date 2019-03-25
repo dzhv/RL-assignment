@@ -5,6 +5,19 @@
 # goalkeeper
 
 episodes=5000
+
+while getopts l:d:c:e: option
+do
+case "${option}"
+in
+l) LR=${OPTARG};;
+d) DF=${OPTARG};;
+c) DC=${OPTARG};;
+e) EXP=$OPTARG;;
+esac
+done
+
+
 ./../../../bin/HFO --defense-agents=2 --offense-agents=1 --offense-on-ball 11 --trials $episodes --headless --deterministic --discrete=True --frames-per-trial 2000 --untouched-time 2000 &
 sleep 5
 ./DiscreteHFO/Initiator.py --numTrials=$episodes --numPlayingDefenseNPCs=1 --numAgents=1 >/dev/null 2>&1 &
@@ -12,7 +25,7 @@ echo "Environment Initialized"
 # Sleep is needed to make sure doesn't get connected too soon, as unum 1 (goalie)
 
 sleep 5
-./QLearning/QLearningBase.py --numOpponents=1 --numEpisodes=$episodes &
+./QLearning/QLearningBase.py --numOpponents=1 --numEpisodes=$episodes --learningRate $LR --discountFactor $DF --decayConstant $DC --experiment $EXP &
 echo "Attacker Controller Initialized"
 
 sleep 5

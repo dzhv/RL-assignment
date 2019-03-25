@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 # encoding utf-8
 
-from DiscreteHFO.HFOAttackingPlayer import HFOAttackingPlayer
-from DiscreteHFO.Agent import Agent
-from collections import defaultdict
-import random
-import argparse
-
 import sys
 from os import path
 
 this_folder = path.dirname(path.abspath(__file__))
 sys.path.append( path.dirname(this_folder) )
+
+from DiscreteHFO.HFOAttackingPlayer import HFOAttackingPlayer
+from DiscreteHFO.Agent import Agent
+from collections import defaultdict
+import random
+import argparse
 
 from logger import Logger
 

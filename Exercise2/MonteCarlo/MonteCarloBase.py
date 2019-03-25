@@ -1,19 +1,27 @@
 #!/usr/bin/env python3
 # encoding utf-8
 
+import sys
+from os import path
+
+this_folder = path.dirname(path.abspath(__file__))
+sys.path.append( path.dirname(this_folder) )
+
 from DiscreteHFO.HFOAttackingPlayer import HFOAttackingPlayer
 from DiscreteHFO.Agent import Agent
 from collections import defaultdict, deque
 import random
 import argparse
 
+from logger import Logger
+
 class MonteCarloAgent(Agent):
 	def __init__(self, discountFactor, epsilon, initVals=0.0):
 		super(MonteCarloAgent, self).__init__()
 
-		self.initEpsilon = epsilon
-		self.setEpsilon(epsilon)
-		self.discountFactor = discountFactor
+		self.initEpsilon = 1
+		self.setEpsilon(self.initEpsilon)
+		self.discountFactor = 0.99
 
 		# dictionary with automatically assigned default value for a new key
 		self.Q = defaultdict(lambda: initVals)
@@ -36,7 +44,6 @@ class MonteCarloAgent(Agent):
 		return True 
 
 	def learn(self):
-		# print("LEARNING:")
 		G = 0
 		resultQueue = deque([])
 		while len(self.experienceQueue) > 0:
@@ -50,16 +57,11 @@ class MonteCarloAgent(Agent):
 			
 			n = self.stateActionVisits[key]
 			self.stateActionVisits[key] += 1
-			
-			# print("State: {0}, action: {1}, reward: {2}".format(state, action, reward))
-			# print("Init key {0} value: {1}".format(key, self.Q[key]))
-			self.Q[key] = self.Q[key] * (n / (n+1)) + G / (n+1) 
-			# print("Updated value: {0}".format(self.Q[key]))
+						
+			self.Q[key] = self.Q[key] * (n / (n+1)) + G / (n+1)
 			
 			resultQueue.appendleft(self.Q[key])
-
-		# print("resultQueue")
-		# print(resultQueue)
+		
 		return self.Q, list(resultQueue)
 
 	def toStateRepresentation(self, state):
@@ -81,7 +83,6 @@ class MonteCarloAgent(Agent):
 		maxAction = None
 		for action in self.possibleActions:
 			QValue = self.Q[self.key(state, action)]
-			# should I worry about equal Q values?
 			if maxQ is None or QValue > maxQ:
 				maxQ = QValue
 				maxAction = action
@@ -108,7 +109,7 @@ class MonteCarloAgent(Agent):
 
 	def computeHyperparameters(self, numTakenActions, episodeNumber):
 		# exponential decay
-		decay_constant = 0.0035
+		decay_constant = 0.0006
 		e = 2.718
 
 		factor = e ** (- decay_constant * episode)
@@ -128,6 +129,7 @@ if __name__ == '__main__':
 	parser.add_argument('--numOpponents', type=int, default=0)
 	parser.add_argument('--numTeammates', type=int, default=0)
 	parser.add_argument('--numEpisodes', type=int, default=500)
+	parser.add_argument('--experiment', type=str, default="exp_test")
 
 	args=parser.parse_args()
 
@@ -135,18 +137,25 @@ if __name__ == '__main__':
 	hfoEnv = HFOAttackingPlayer(numOpponents = args.numOpponents, 
 		numTeammates = args.numTeammates, agentId = args.id)
 	hfoEnv.connectToServer()
-
-	# Initialize a Monte-Carlo Agent
+	
 	agent = MonteCarloAgent(discountFactor = 0.99, epsilon = 1.0)
 	numEpisodes = args.numEpisodes
-	numTakenActions = 0
-	# Run training Monte Carlo Method
+	numTakenActions = 0	
+
+	logger = Logger(path.join(this_folder, "output_{0}.out".format(args.experiment)))
+	
+	goals = 0
 	for episode in range(numEpisodes):
 		print("EPISODE: {0}/{1}".format(episode, numEpisodes))	
 		agent.reset()
 		observation = hfoEnv.reset()
 		status = 0
 
+		if episode % 100 == 0:
+			msg = "Goals last 100 episodes: {0}".format(goals)
+			print(msg)
+			logger.log(msg)
+			goals = 0
 		while status==0:
 			epsilon = agent.computeHyperparameters(numTakenActions, episode)
 			agent.setEpsilon(epsilon)
@@ -155,6 +164,10 @@ if __name__ == '__main__':
 			action = agent.act()
 			numTakenActions += 1
 			nextObservation, reward, done, status = hfoEnv.step(action)
+
+			if reward > 0:
+				goals += 1
+
 			agent.setExperience(agent.toStateRepresentation(obsCopy), action, reward, 
 				status, agent.toStateRepresentation(nextObservation))
 			observation = nextObservation

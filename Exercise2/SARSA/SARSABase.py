@@ -12,9 +12,9 @@ class SARSAAgent(Agent):
 		super(SARSAAgent, self).__init__()
 
 		self.initLearningRate = 0.1
-		self.setLearningRate(learningRate)
+		self.setLearningRate(self.initLearningRate)
 		self.initEpsilon = 1
-		self.setEpsilon(epsilon)
+		self.setEpsilon(self.initEpsilon)
 		self.discountFactor = 0.99
 
 		# dictionary with automatically assigned default value for a new key

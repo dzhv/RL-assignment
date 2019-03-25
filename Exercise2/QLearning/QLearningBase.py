@@ -21,9 +21,9 @@ class QLearningAgent(Agent):
 		super(QLearningAgent, self).__init__()
 		
 		self.initLearningRate = learningRate
-		self.setLearningRate(learningRate)
+		self.setLearningRate(self.initLearningRate)
 		self.initEpsilon = 1
-		self.setEpsilon(epsilon)
+		self.setEpsilon(self.initEpsilon)
 		self.discountFactor = discountFactor
 		self.decay_constant = decay_constant
 

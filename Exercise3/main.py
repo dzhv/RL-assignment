@@ -18,9 +18,10 @@ if __name__ == "__main__" :
 
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--id', type=int, default=0)
-	parser.add_argument('--numEpisodes', type=int, default=10000)
+	parser.add_argument('--numEpisodes', type=int, default=15000)
 	parser.add_argument('--experiment', type=str, default="exp_test")
 	parser.add_argument('--lr', type=float, default=1e-4)
+	parser.add_argument('--n_workers', type=int, default=6)
 
 	args = parser.parse_args()
 	experiment = args.experiment
@@ -33,11 +34,11 @@ if __name__ == "__main__" :
 	os.system("mkdir model_weights/{0}".format(experiment))
 
 	config = {
-		"n_workers": 6,
-		"startingEpsilons": [1, 0.8, 0.5, 0.5, 0.3, 0.1],
-		"minEpsilons": [0.4, 0.35, 0.25, 0.25, 0.15, 0],
-		"numPolicyUpdates": 5000,
-		"discountFactor": 0.99,
+		"n_workers": args.n_workers,
+		"startingEpsilons": [1, 0.8, 0.5, 0.5, 0.3, 0.1, 0.7, 0.4],
+		"minEpsilons": [0.4, 0.35, 0.25, 0.25, 0.15, 0, 0.3, 0],
+		"numPolicyUpdates": 8000,
+		"discountFactor": 0.99,			# worth exploring
 		"learning_rate": args.lr,
 		"learning_network_update_interval": 6,
 		"target_network_update_interval": 200,

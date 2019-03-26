@@ -5,7 +5,7 @@ def run(num_episodes, networks, environment, policy, logger, counter):
 	last_counter_value = -1
 	counter_checks = 0
 	for i in range(num_episodes):
-		logger.log("Episode {0}/{1}".format(i, num_episodes))
+		# logger.log("Episode {0}/{1}".format(i, num_episodes))
 		environment.reset()
 
 		while True:
@@ -19,11 +19,14 @@ def run(num_episodes, networks, environment, policy, logger, counter):
 			if reward == 1:
 				goals += 1
 
+			if status == 5:
+				logger.log("Something is wrong, getting Status 5")
+
 			if done:
 				break
 
-		if i != 1 and i % 10 == 0:
-			logger.log("Goals over 10 last episodes: {0}".format(goals))
+		if i != 1 and i % 100 == 0:
+			logger.log("Goals over 100 last episodes: {0}".format(goals))
 			goals = 0
 		
 		if not counter is None:

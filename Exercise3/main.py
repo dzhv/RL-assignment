@@ -18,7 +18,7 @@ if __name__ == "__main__" :
 
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--id', type=int, default=0)
-	parser.add_argument('--numEpisodes', type=int, default=15000)
+	parser.add_argument('--numEpisodes', type=int, default=30000)
 	parser.add_argument('--experiment', type=str, default="exp_test")
 	parser.add_argument('--lr', type=float, default=1e-4)
 	parser.add_argument('--n_workers', type=int, default=6)

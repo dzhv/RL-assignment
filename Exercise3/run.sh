@@ -1,7 +1,7 @@
 killall -9 rcssserver
 sleep 5
 
-python main.py --experiment "exp7" --lr 0.000025 --discountFactor 0.96
+python main.py --experiment "exp9" --lr 0.000025 --discountFactor 0.99 --n_workers 6 --num_layers 3
 
 sleep 5
 rm -r log
@@ -10,6 +10,13 @@ sleep 10
 killall -9 rcssserver
 sleep 3
 
-python main.py --experiment "exp8" --lr 0.000025 --discountFactor 0.96 --n_workers 8 --numEpisodes 25000
+python main.py --experiment "exp10" --lr 0.000025 --discountFactor 0.99 --n_workers 6 --num_layers 3 --hiden_size 40
 
+sleep 5
 rm -r log
+killall -9 rcssserver
+sleep 10
+killall -9 rcssserver
+sleep 3
+
+python main.py --experiment "exp11" --lr 0.000015 --discountFactor 0.99 --n_workers 6 --num_layers 3 --hiden_size 40

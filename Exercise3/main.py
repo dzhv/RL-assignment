@@ -23,6 +23,8 @@ if __name__ == "__main__" :
 	parser.add_argument('--lr', type=float, default=1e-4)
 	parser.add_argument('--n_workers', type=int, default=6)
 	parser.add_argument('--discountFactor', type=float, default=0.99)
+	parser.add_argument('--hidden_size', type=int, default=25)
+	parser.add_argument('--num_layers', type=int, default=2)
 
 	args = parser.parse_args()
 	experiment = args.experiment
@@ -47,7 +49,9 @@ if __name__ == "__main__" :
 		"max_grads": 1,
 		"parameter_save_frequency": 1000000,
 		"numEpisodes": args.numEpisodes,
-		"experiment": experiment
+		"experiment": experiment,
+		"hidden_size": args.hidden_size,
+		"num_layers": args.num_layers
 	}
 	workers, target_network = worker_factory.create_workers(config, logger)
 	logger.log("running {0} workers".format(len(workers)))

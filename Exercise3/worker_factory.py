@@ -10,9 +10,10 @@ from logger import Logger
 def create_workers(config, logger):
     counter = mp.Value('i', 0)
     
-    learning_network = network_factory.create_network()
-    target_network = network_factory.create_network()
-    learning_network.load_state_dict(target_network.state_dict())    
+    learning_network = network_factory.create_network(num_layers=config["num_layers"], 
+        hidden_size=config["hidden_size"])
+    target_network = network_factory.create_network(num_layers=config["num_layers"], hidden_size=config["hidden_size"])
+    learning_network.load_state_dict(target_network.state_dict())
 
     optimizer = SharedAdam(learning_network.parameters(), lr=config["learning_rate"])
     optimizer.share_memory()

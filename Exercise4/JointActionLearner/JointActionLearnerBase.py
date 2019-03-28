@@ -1,58 +1,172 @@
 #!/usr/bin/env python3
 # encoding utf-8
 
+import sys
+from os import path
+sys.path.append( path.dirname( path.dirname( __file__ ) ) )
+
 import random
 import argparse
 from DiscreteMARLUtils.Environment import DiscreteMARLEnvironment
 from DiscreteMARLUtils.Agent import Agent
 from copy import deepcopy
 import itertools
+import argparse
+from itertools import combinations_with_replacement as combinations
+from collections import defaultdict
 		
 class JointQLearningAgent(Agent):
 	def __init__(self, learningRate, discountFactor, epsilon, numTeammates, initVals=0.0):
-		super(JointQLearningAgent, self).__init__()
-		
+		super(JointQLearningAgent, self).__init__()	
+
+		self.initLearningRate = 0.15
+		self.setLearningRate(self.initLearningRate)
+		self.initEpsilon = 1
+		self.setEpsilon(self.initEpsilon)
+		self.discountFactor = 0.95
+		self.decay_constant = 0.00025
+
+		# Best:    lr= 0.15, dc = 0.00025  df = 0.95   |   ???
+
+		self.numTeammates = numTeammates
+		self.possibleActions = ['MOVE_UP', 'MOVE_DOWN', 'MOVE_LEFT', 'MOVE_RIGHT', 'KICK', 'NO_OP']
+
+		# dictionary with automatically assigned default value for a new key
+		self.Q = defaultdict(lambda: initVals)
+		# opponent model
+		self.C = defaultdict(lambda: 0)		
+		self.state_counts = defaultdict(lambda: 0)
 
 	def setExperience(self, state, action, oppoActions, reward, status, nextState):
-		raise NotImplementedError
-		
+		self.currState = state
+		self.action = action
+		self.reward = reward
+		self.nextState = nextState
+		self.oppoActions = oppoActions
+
+	def key(self, state, actions):
+		return "state: {0}, actions: {1}".format(state, actions)	
+	
 	def learn(self):
-		raise NotImplementedError
+		self.state_counts[self.currState] += 1
+		self.C[self.key(self.currState, self.oppoActions)] += 1
+
+		actions = [self.action] + self.oppoActions
+
+		Qkey = self.key(self.currState, actions)
+		initialQVal = self.Q[Qkey]
+				
+		target = self.reward + self.discountFactor * self.maxQ(self.nextState)
+		self.Q[Qkey] = initialQVal + self.currLearningRate * (target - initialQVal)
+
+		return self.Q[Qkey] - initialQVal
 
 	def act(self):
-		raise NotImplementedError
+		return self.policy(self.currState)
 
-	def setEpsilon(self, epsilon) :
-		raise NotImplementedError
+	def policy(self, state):
+		# gives the next action in an epsilon-greedy fashion
+		explore = random.random() < self.currEpsilon
+		if explore:
+			return self.randomAction()
+
+		return self.greedyAction(state)
+
+	def randomAction(self):
+		actionIndex = random.randint(0, len(self.possibleActions) - 1)
+		return self.possibleActions[actionIndex]
+
+	def maxQAction(self, state):
+		# finds an action with the biggest Q value for the state
+		# returns (action, QValue) pair
+
+		maxScore = None
+		maxAction = None
 		
-	def setLearningRate(self, learningRate) :
-		raise NotImplementedError
+		all_action_combinations = list(combinations(self.possibleActions, self.numTeammates + 1))
 
-	def setState(self, state):
-		raise NotImplementedError
+		for actions in all_action_combinations:
+			QValue = self.Q[self.key(state, actions)]
+			score = self.get_actions_estimate(state, actions[1:]) * QValue
+			if maxScore is None or score > maxScore:
+				maxScore = score
+				maxAction = actions[0]
+
+		return maxAction, maxScore
+
+	def get_actions_estimate(self, state, oppoActions):
+		# computes the estimate probability that opponents will take 
+		# actions oppoActions
+		# Which is regarded as C(s, a_i-1) / n (s)   in the algorithm
+
+		if self.state_counts[state] == 0:
+			return 1 / len(oppoActions)
+
+		CValue = self.C[self.key(state, oppoActions)]
+		return CValue / self.state_counts[state]
+
+	def greedyAction(self, state):
+		# gets greedy action
+		return self.maxQAction(state)[0]
+
+	def maxQ(self, state):
+		# gets the Q value of a greedy action
+		return self.maxQAction(state)[1]
 
 	def toStateRepresentation(self, rawState):
-		raise NotImplementedError
+		return str(rawState)
+
+	def setState(self, state):
+		self.currState = state
+
+	def setLearningRate(self, learningRate):
+		self.currLearningRate = learningRate
+
+	def setEpsilon(self, epsilon):
+		self.currEpsilon = epsilon
 		
 	def computeHyperparameters(self, numTakenActions, episodeNumber):
-		raise NotImplementedError
+		# exponential decay
+		decay_constant = self.decay_constant
+		e = 2.718
+
+		factor = e ** (- decay_constant * episode)
+
+		learningRate = self.initLearningRate# * factor
+		epsilon = self.initEpsilon * factor
+
+		return learningRate, epsilon	
 
 if __name__ == '__main__':
 
-	MARLEnv = DiscreteMARLEnvironment(numOpponents = args.numOpponents, numAgents = args.numAgents, seed=randomSeed)
+	parser = argparse.ArgumentParser()
+	parser.add_argument('--numOpponents', type=int, default=1)
+	parser.add_argument('--numAgents', type=int, default=2)
+	parser.add_argument('--numEpisodes', type=int, default=50000)
+
+	args=parser.parse_args()
+
+	MARLEnv = DiscreteMARLEnvironment(numOpponents = args.numOpponents, numAgents = args.numAgents)
 	agents = []
-	numAgents = 2
-	numEpisodes = 4000
+	numAgents = args.numAgents
+	numEpisodes = args.numEpisodes
 	for i in range(numAgents):
-		agent = JointQLearningAgent(learningRate = 0.1, discountFactor = 0.9, epsilon = 1.0, numTeammates=args.numAgents-1)
+		agent = JointQLearningAgent(learningRate = 0.1, discountFactor = 0.9, 
+			epsilon = 1.0, numTeammates=args.numAgents-1)
 		agents.append(agent)
 
 	numEpisodes = numEpisodes
 	numTakenActions = 0
 
+	total_reward = 0
+	reward_last_1000 = 0
 	for episode in range(numEpisodes):	
 		status = ["IN_GAME","IN_GAME","IN_GAME"]
 		observation = MARLEnv.reset()
+
+		if episode % 1000 == 0:
+			print("Reward last 1000 episodes: {0}".format(reward_last_1000))
+			reward_last_1000 = 0
 			
 		while status[0]=="IN_GAME":
 			for agent in agents:
@@ -70,11 +184,20 @@ if __name__ == '__main__':
 			nextObservation, reward, done, status = MARLEnv.step(actions)
 			numTakenActions += 1
 
+			if reward[0] != reward[1]:
+				raise Exception("ehm what? reward[0] != reward[1]")
+
+			total_reward += reward[0]
+			reward_last_1000 += reward[0] 
+
 			for agentIdx in range(args.numAgents):
 				oppoActions = actions.copy()
 				del oppoActions[agentIdx]
-				agents[agentIdx].setExperience(agents[agentIdx].toStateRepresentation(stateCopies[agentIdx]), actions[agentIdx], oppoActions, 
-					reward[agentIdx], status[agentIdx], nextObservation[agentIdx])
+				agents[agentIdx].setExperience(agents[agentIdx].toStateRepresentation(stateCopies[agentIdx]), 
+					actions[agentIdx], oppoActions, 
+					reward[agentIdx], status[agentIdx], agent.toStateRepresentation(nextObservation[agentIdx]))
 				agents[agentIdx].learn()
 				
 			observation = nextObservation
+
+	print("Average reward over 1000 episodes: {0}".format(total_reward * 1000 / numEpisodes))

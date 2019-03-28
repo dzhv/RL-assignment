@@ -23,7 +23,7 @@ class JointQLearningAgent(Agent):
 		self.setLearningRate(self.initLearningRate)
 		self.initEpsilon = 1
 		self.setEpsilon(self.initEpsilon)
-		self.discountFactor = 0.99
+		self.discountFactor = 0.95
 		self.decay_constant = 0.00025
 
 		# Best:    lr= 0.15, dc = 0.00025  df = 0.95   |   ???

@@ -1,6 +1,6 @@
 from Worker import *
 
-def run(num_episodes, networks, environment, policy, logger, counter):
+def run(num_episodes, network, environment, policy, logger, counter):
 	goals = 0
 	last_counter_value = -1
 	counter_checks = 0
@@ -10,7 +10,7 @@ def run(num_episodes, networks, environment, policy, logger, counter):
 
 		while True:
 			state = environment.curState
-			action, q_value = policy.greedyAction(computePredictions(state, networks["learning"]))
+			action, q_value = policy.greedyAction(computePredictions(state, network))
 
 			# logger.log(str(networks["learning"].model[2].weight))
 

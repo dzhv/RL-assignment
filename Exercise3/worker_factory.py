@@ -51,5 +51,5 @@ def create_greedy_worker(networks, counter, config):
     environment = HFOEnv(port=6321, seed=86868686, numOpponents=1)
     environment.connectToServer()
 
-    w_args = (100000, networks, environment, Policy(logger=logger), logger, counter)
+    w_args = (100000, networks["learning"], environment, Policy(logger=logger), logger, counter)
     return mp.Process(target=policy_worker.run, args=w_args)

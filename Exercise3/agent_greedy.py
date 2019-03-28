@@ -27,7 +27,7 @@ if __name__ == "__main__" :
 	environment = HFOEnv(port=6011, seed=rnd_seed, numOpponents=1)
 	environment.connectToServer()
 
-	policy_worker.run(num_episodes=1000, value_network=value_network, 
+	policy_worker.run(num_episodes=1000, network=value_network, 
 		environment=environment, policy=Policy(logger=logger), logger=logger, counter=None)
 
 	environment.quitGame()

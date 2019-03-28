@@ -23,7 +23,7 @@ class JointQLearningAgent(Agent):
 		self.setLearningRate(self.initLearningRate)
 		self.initEpsilon = 1
 		self.setEpsilon(self.initEpsilon)
-		self.discountFactor = 0.95
+		self.discountFactor = 0.99
 		self.decay_constant = 0.00025
 
 		# Best:    lr= 0.15, dc = 0.00025  df = 0.95   |   ???
@@ -44,8 +44,8 @@ class JointQLearningAgent(Agent):
 		self.nextState = nextState
 		self.oppoActions = oppoActions
 
-	def key(self, state, actions):
-		return "state: {0}, actions: {1}".format(state, actions)	
+	def key(self, state, actions):		
+		return "state: {0}, actions: {1}".format(state, list(actions))
 	
 	def learn(self):
 		self.state_counts[self.currState] += 1
@@ -59,7 +59,11 @@ class JointQLearningAgent(Agent):
 		target = self.reward + self.discountFactor * self.maxQ(self.nextState)
 		self.Q[Qkey] = initialQVal + self.currLearningRate * (target - initialQVal)
 
-		return self.Q[Qkey] - initialQVal
+		update = self.Q[Qkey] - initialQVal
+		# if update != 0:
+		# 	print("Update: {0}".format(update))
+
+		return update
 
 	def act(self):
 		return self.policy(self.currState)
@@ -77,8 +81,8 @@ class JointQLearningAgent(Agent):
 		return self.possibleActions[actionIndex]
 
 	def maxQAction(self, state):
-		# finds an action with the biggest Q value for the state
-		# returns (action, QValue) pair
+		# finds an action with the biggest score for the state
+		# returns (action, score) pair
 
 		maxScore = None
 		maxAction = None
@@ -103,6 +107,8 @@ class JointQLearningAgent(Agent):
 			return 1 / len(oppoActions)
 
 		CValue = self.C[self.key(state, oppoActions)]
+		# if CValue > 0:
+		# 	print("C: {0}".format(CValue))
 		return CValue / self.state_counts[state]
 
 	def greedyAction(self, state):
@@ -167,6 +173,15 @@ if __name__ == '__main__':
 		if episode % 1000 == 0:
 			print("Reward last 1000 episodes: {0}".format(reward_last_1000))
 			reward_last_1000 = 0
+
+			# count_non_zero =0 
+			# for key, value in agents[0].Q.items():
+			# 	if value != 0:
+			# 		count_non_zero += 1
+
+			# print("non zero Qs: {0}".format(count_non_zero))
+			# print("total num of Qs: {0}".format(len(agents[0].Q)))
+			# print(agents[0].Q)
 			
 		while status[0]=="IN_GAME":
 			for agent in agents:

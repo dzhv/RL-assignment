@@ -141,7 +141,8 @@ class JointQLearningAgent(Agent):
 		factor = e ** (- decay_constant * episode)		
 		epsilon = self.initEpsilon * factor
 
-		learningRate = max(0.02, self.initLearningRate - episodeNumber / 1.4e-5)# * factor
+		# learningRate = max(0.02, self.initLearningRate - episodeNumber / 1.4e-5)# * factor
+		learningRate = self.initLearningRate
 
 		return learningRate, epsilon	
 
@@ -200,9 +201,6 @@ if __name__ == '__main__':
 
 			nextObservation, reward, done, status = MARLEnv.step(actions)
 			numTakenActions += 1
-
-			if reward[0] != reward[1]:
-				raise Exception("ehm what? reward[0] != reward[1]")
 
 			total_reward += reward[0]
 			reward_last_1000 += reward[0] 

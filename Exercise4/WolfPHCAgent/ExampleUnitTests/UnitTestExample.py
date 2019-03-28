@@ -1,3 +1,9 @@
+import sys
+from os import path
+
+test_folder = path.dirname(path.abspath(__file__))
+sys.path.append( path.dirname( test_folder ) )
+
 from WolfPHCBase import WolfPHCAgent
 import csv
 import ast
@@ -16,8 +22,8 @@ def csvLoader(filename):
 
 if __name__ == '__main__':
 	
-	inputData = csvLoader('Input.csv')
-	outputData = csvLoader('Output.csv')
+	inputData = csvLoader(path.join(test_folder, 'Input.csv'))
+	outputData = csvLoader(path.join(test_folder, 'Output.csv'))
 
 	# For the sake of an example, assume learning rate of 0.1, winDelta of 0.01 and loseDelta of 0.1
 	learningRate = 0.1
@@ -91,7 +97,11 @@ if __name__ == '__main__':
 				correctPol = [float(x) for x in correctPol]
 
 				policyOut = agents[agentIdx].calculatePolicyUpdate()
-				for idx in range(len(policyOut)):
+				print("expected:")
+				print(correctPol)
+				print("actual:")
+				print(policyOut)
+				for idx in range(len(policyOut)):					
 					if not math.isclose(policyOut[idx], correctPol[idx], abs_tol=1e-4):
 						print("Wrong Policy Output")
 						exit()

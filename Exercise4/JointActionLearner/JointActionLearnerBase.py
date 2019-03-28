@@ -23,7 +23,7 @@ class JointQLearningAgent(Agent):
 		self.setLearningRate(self.initLearningRate)
 		self.initEpsilon = 1
 		self.setEpsilon(self.initEpsilon)
-		self.discountFactor = 0.99
+		self.discountFactor = 0.95
 		self.decay_constant = 0.00025
 
 		# Best:    lr= 0.15, dc = 0.00025  df = 0.95   |   694.739
@@ -34,7 +34,7 @@ class JointQLearningAgent(Agent):
 		# dictionary with automatically assigned default value for a new key
 		self.Q = defaultdict(lambda: initVals)
 		# opponent model
-		self.C = defaultdict(lambda: 0)		
+		self.C = defaultdict(lambda: initVals)
 		self.state_counts = defaultdict(lambda: 0)
 
 	def setExperience(self, state, action, oppoActions, reward, status, nextState):
@@ -138,10 +138,10 @@ class JointQLearningAgent(Agent):
 		decay_constant = self.decay_constant
 		e = 2.718
 
-		factor = e ** (- decay_constant * episode)
-
-		learningRate = self.initLearningRate# * factor
+		factor = e ** (- decay_constant * episode)		
 		epsilon = self.initEpsilon * factor
+
+		learningRate = max(0.02, self.initLearningRate - episodeNumber / 1.4e-5)# * factor
 
 		return learningRate, epsilon	
 

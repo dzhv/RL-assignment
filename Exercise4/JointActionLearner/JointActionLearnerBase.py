@@ -23,10 +23,10 @@ class JointQLearningAgent(Agent):
 		self.setLearningRate(self.initLearningRate)
 		self.initEpsilon = 1
 		self.setEpsilon(self.initEpsilon)
-		self.discountFactor = 0.95
+		self.discountFactor = 0.99
 		self.decay_constant = 0.00025
 
-		# Best:    lr= 0.15, dc = 0.00025  df = 0.95   |   ???
+		# Best:    lr= 0.15, dc = 0.00025  df = 0.95   |   694.739
 
 		self.numTeammates = numTeammates
 		self.possibleActions = ['MOVE_UP', 'MOVE_DOWN', 'MOVE_LEFT', 'MOVE_RIGHT', 'KICK', 'NO_OP']
@@ -54,14 +54,12 @@ class JointQLearningAgent(Agent):
 		actions = [self.action] + self.oppoActions
 
 		Qkey = self.key(self.currState, actions)
-		initialQVal = self.Q[Qkey]
+		initialQVal = self.Q[Qkey]		
 				
 		target = self.reward + self.discountFactor * self.maxQ(self.nextState)
 		self.Q[Qkey] = initialQVal + self.currLearningRate * (target - initialQVal)
 
 		update = self.Q[Qkey] - initialQVal
-		# if update != 0:
-		# 	print("Update: {0}".format(update))
 
 		return update
 
@@ -87,14 +85,20 @@ class JointQLearningAgent(Agent):
 		maxScore = None
 		maxAction = None
 		
-		all_action_combinations = list(combinations(self.possibleActions, self.numTeammates + 1))
+		oppo_action_combinations = list(combinations(self.possibleActions, self.numTeammates))
 
-		for actions in all_action_combinations:
-			QValue = self.Q[self.key(state, actions)]
-			score = self.get_actions_estimate(state, actions[1:]) * QValue
+		for action in self.possibleActions:
+			score = 0 
+			for oppo_actions in oppo_action_combinations:
+				actions = [action] + list(oppo_actions)
+				QValue = self.Q[self.key(state, actions)]
+				# if QValue != 0:
+				# 	print("all good")
+				score += self.get_actions_estimate(state, oppo_actions) * QValue
+
 			if maxScore is None or score > maxScore:
 				maxScore = score
-				maxAction = actions[0]
+				maxAction = action
 
 		return maxAction, maxScore
 
@@ -102,13 +106,11 @@ class JointQLearningAgent(Agent):
 		# computes the estimate probability that opponents will take 
 		# actions oppoActions
 		# Which is regarded as C(s, a_i-1) / n (s)   in the algorithm
-
+	
 		if self.state_counts[state] == 0:
-			return 1 / len(oppoActions)
+			return 1 / (len(oppoActions) * len(self.possibleActions))
 
 		CValue = self.C[self.key(state, oppoActions)]
-		# if CValue > 0:
-		# 	print("C: {0}".format(CValue))
 		return CValue / self.state_counts[state]
 
 	def greedyAction(self, state):

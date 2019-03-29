@@ -14,7 +14,7 @@ import numpy as np
 from collections import defaultdict
 		
 class WolfPHCAgent(Agent):
-	def __init__(self, learningRate=0.15, discountFactor=0.95, winDelta=0.005, loseDelta=0.05, initVals=0.0):
+	def __init__(self, learningRate=0.15, discountFactor=0.97, winDelta=0.001, loseDelta=0.01, initVals=0.0):
 		super(WolfPHCAgent, self).__init__()
 
 		self.initLearningRate = learningRate
@@ -26,7 +26,7 @@ class WolfPHCAgent(Agent):
 		self.discountFactor = discountFactor
 		self.decay_constant = 0.00025
 
-		# Best:    lr= 0.15, dc = 0.00025  df = 0.95 winDelta=0.01 loseDelta=0.1   |   ???
+		# Best:    lr= 0.15, dc = 0.00025  df = 0.95 winDelta=0.01 loseDelta=0.1   |   608
 
 		self.possibleActions = ['MOVE_UP', 'MOVE_DOWN', 'MOVE_LEFT', 'MOVE_RIGHT', 'KICK', 'NO_OP']
 
@@ -37,7 +37,6 @@ class WolfPHCAgent(Agent):
 		self.avg_pi = defaultdict(lambda: 1 / len(self.possibleActions))
 		# state counts
 		self.C = defaultdict(lambda: initVals)
-		
 		
 	def setExperience(self, state, action, reward, status, nextState):
 		self.currState = state
@@ -146,8 +145,8 @@ class WolfPHCAgent(Agent):
 		self.loseDelta = loseDelta
 	
 	def computeHyperparameters(self, numTakenActions, episodeNumber):
-		loseDelta = min(0.9, self.initLoseDelta + episodeNumber * 0.0001)
-		winDelta = min(1, self.initWinDelta + episodeNumber * 0.0001)
+		loseDelta = min(0.9, self.initLoseDelta + episodeNumber * 0.00001)
+		winDelta = min(1, self.initWinDelta + episodeNumber * 0.00001)
 
 		return loseDelta, winDelta, self.initLearningRate
 
@@ -156,7 +155,7 @@ if __name__ == '__main__':
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--numOpponents', type=int, default=1)
 	parser.add_argument('--numAgents', type=int, default=2)
-	parser.add_argument('--numEpisodes', type=int, default=100000)
+	parser.add_argument('--numEpisodes', type=int, default=50000)
 
 	args=parser.parse_args()
 
@@ -166,7 +165,7 @@ if __name__ == '__main__':
 
 	agents = []
 	for i in range(args.numAgents):
-		agent = WolfPHCAgent(learningRate = 0.2, discountFactor = 0.99, winDelta=0.01, loseDelta=0.1)
+		agent = WolfPHCAgent()
 		agents.append(agent)
 
 	numEpisodes = args.numEpisodes
@@ -180,6 +179,7 @@ if __name__ == '__main__':
 		if episode % 1000 == 0:
 			print("Reward last 1000 episodes: {0}".format(reward_last_1000))
 			reward_last_1000 = 0
+			print("Deltas: winning {0}, lose {1}".format(agents[0].winDelta, agents[0].loseDelta))
 		
 		while status[0]=="IN_GAME":
 			for agent in agents:
@@ -197,11 +197,7 @@ if __name__ == '__main__':
 				actions.append(agent.act())
 				agentIdx += 1
 			nextObservation, reward, done, status = MARLEnv.step(actions)
-			numTakenActions += 1
-
-
-			if reward[0] != reward[1]:
-				raise Exception("ehm what? reward[0] != reward[1]")
+			numTakenActions += 1			
 
 			total_reward += reward[0]
 			reward_last_1000 += reward[0] 

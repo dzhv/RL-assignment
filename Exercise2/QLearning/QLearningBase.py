@@ -13,18 +13,16 @@ from collections import defaultdict
 import random
 import argparse
 
-from logger import Logger
-
 
 class QLearningAgent(Agent):
-	def __init__(self, learningRate, discountFactor, epsilon, initVals=0.0):
+	def __init__(self, learningRate=0.1, discountFactor=0.95, epsilon=1, initVals=0.0):
 		super(QLearningAgent, self).__init__()
 		
-		self.initLearningRate = 0.1
+		self.initLearningRate = learningRate
 		self.setLearningRate(self.initLearningRate)
-		self.initEpsilon = 1
+		self.initEpsilon = epsilon
 		self.setEpsilon(self.initEpsilon)
-		self.discountFactor = 0.95
+		self.discountFactor = discountFactor
 		self.decay_constant = 0.0006
 
 		# dictionary with automatically assigned default value for a new key
@@ -128,11 +126,7 @@ if __name__ == '__main__':
 	parser.add_argument('--experiment', type=str, default="exp1")
 
 	args=parser.parse_args()
-
-	logger = Logger(path.join(this_folder, "output_{0}.out".format(args.experiment)))
-	logger.log(str(args))
-
-	print(args)
+	
 
 	# Initialize connection with the HFO server
 	hfoEnv = HFOAttackingPlayer(numOpponents = args.numOpponents, numTeammates = args.numTeammates, 
@@ -148,16 +142,10 @@ if __name__ == '__main__':
 	numTakenActions = 0 
 	goals = 0
 	for episode in range(numEpisodes):
-		print("EPISODE: {0}/{1}".format(episode, numEpisodes))
 
 		status = 0
 		observation = hfoEnv.reset()
-		
-		if episode % 100 == 0:
-			msg = "Goals last 100 episodes: {0}".format(goals)
-			print(msg)
-			logger.log(msg)
-			goals = 0
+				
 		while status==0:
 			learningRate, epsilon = agent.computeHyperparameters(numTakenActions, episode)
 			agent.setEpsilon(epsilon)
@@ -177,6 +165,4 @@ if __name__ == '__main__':
 				agent.toStateRepresentation(nextObservation))
 			update = agent.learn()
 			
-			observation = nextObservation
-
-	print(agent.Q)
+			observation = nextObservation	

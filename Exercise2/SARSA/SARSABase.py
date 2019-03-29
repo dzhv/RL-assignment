@@ -8,14 +8,14 @@ from collections import defaultdict, deque
 import random
 
 class SARSAAgent(Agent):
-	def __init__(self, learningRate, discountFactor, epsilon, initVals=0.0):
+	def __init__(self, learningRate=0.1, discountFactor=0.99, epsilon=1, initVals=0.0):
 		super(SARSAAgent, self).__init__()
 
-		self.initLearningRate = 0.1
+		self.initLearningRate = learningRate
 		self.setLearningRate(self.initLearningRate)
-		self.initEpsilon = 1
+		self.initEpsilon = epsilon
 		self.setEpsilon(self.initEpsilon)
-		self.discountFactor = 0.99
+		self.discountFactor = discountFactor
 
 		# dictionary with automatically assigned default value for a new key
 		self.Q = defaultdict(lambda: initVals)
@@ -129,7 +129,6 @@ if __name__ == '__main__':
 	numTakenActions = 0 
 	goals = 0
 	for episode in range(numEpisodes):
-		print("EPISODE: {0}/{1}".format(episode, numEpisodes))
 
 		agent.reset()
 		status = 0
@@ -138,10 +137,7 @@ if __name__ == '__main__':
 		nextObservation = None
 		epsStart = True
 
-
-		if episode % 100 == 0:
-			print("Goals last 100 episodes: {0}".format(goals))
-			goals = 0
+		
 		while status==0:
 			learningRate, epsilon = agent.computeHyperparameters(numTakenActions, episode)
 			agent.setEpsilon(epsilon)

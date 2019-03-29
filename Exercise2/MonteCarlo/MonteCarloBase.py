@@ -13,15 +13,13 @@ from collections import defaultdict, deque
 import random
 import argparse
 
-from logger import Logger
-
 class MonteCarloAgent(Agent):
-	def __init__(self, discountFactor, epsilon, initVals=0.0):
+	def __init__(self, discountFactor=0.99, epsilon=1, initVals=0.0):
 		super(MonteCarloAgent, self).__init__()
 
-		self.initEpsilon = 1
+		self.initEpsilon = epsilon
 		self.setEpsilon(self.initEpsilon)
-		self.discountFactor = 0.99
+		self.discountFactor = discountFactor
 
 		# dictionary with automatically assigned default value for a new key
 		self.Q = defaultdict(lambda: initVals)
@@ -141,21 +139,13 @@ if __name__ == '__main__':
 	agent = MonteCarloAgent(discountFactor = 0.99, epsilon = 1.0)
 	numEpisodes = args.numEpisodes
 	numTakenActions = 0	
-
-	logger = Logger(path.join(this_folder, "output_{0}.out".format(args.experiment)))
 	
 	goals = 0
 	for episode in range(numEpisodes):
-		print("EPISODE: {0}/{1}".format(episode, numEpisodes))	
 		agent.reset()
 		observation = hfoEnv.reset()
 		status = 0
 
-		if episode % 100 == 0:
-			msg = "Goals last 100 episodes: {0}".format(goals)
-			print(msg)
-			logger.log(msg)
-			goals = 0
 		while status==0:
 			epsilon = agent.computeHyperparameters(numTakenActions, episode)
 			agent.setEpsilon(epsilon)
@@ -163,10 +153,7 @@ if __name__ == '__main__':
 			agent.setState(agent.toStateRepresentation(obsCopy))
 			action = agent.act()
 			numTakenActions += 1
-			nextObservation, reward, done, status = hfoEnv.step(action)
-
-			if reward > 0:
-				goals += 1
+			nextObservation, reward, done, status = hfoEnv.step(action)			
 
 			agent.setExperience(agent.toStateRepresentation(obsCopy), action, reward, 
 				status, agent.toStateRepresentation(nextObservation))

@@ -11,19 +11,18 @@ from DiscreteMARLUtils.Environment import DiscreteMARLEnvironment
 from DiscreteMARLUtils.Agent import Agent
 from copy import deepcopy
 import itertools
-import argparse
 from itertools import combinations_with_replacement as combinations
 from collections import defaultdict
 		
 class JointQLearningAgent(Agent):
-	def __init__(self, learningRate, discountFactor, epsilon, numTeammates, initVals=0.0):
+	def __init__(self, learningRate=0.15, discountFactor=0.9, epsilon=1, numTeammates=1, initVals=0.0):
 		super(JointQLearningAgent, self).__init__()	
 
-		self.initLearningRate = 0.15
+		self.initLearningRate = learningRate
 		self.setLearningRate(self.initLearningRate)
-		self.initEpsilon = 1
+		self.initEpsilon = epsilon
 		self.setEpsilon(self.initEpsilon)
-		self.discountFactor = 0.95
+		self.discountFactor = discountFactor
 		self.decay_constant = 0.00025
 
 		# Best:    lr= 0.15, dc = 0.00025  df = 0.95   |   694.739
@@ -160,8 +159,7 @@ if __name__ == '__main__':
 	numAgents = args.numAgents
 	numEpisodes = args.numEpisodes
 	for i in range(numAgents):
-		agent = JointQLearningAgent(learningRate = 0.1, discountFactor = 0.9, 
-			epsilon = 1.0, numTeammates=args.numAgents-1)
+		agent = JointQLearningAgent()
 		agents.append(agent)
 
 	numEpisodes = numEpisodes
@@ -176,15 +174,6 @@ if __name__ == '__main__':
 		if episode % 1000 == 0:
 			print("Reward last 1000 episodes: {0}".format(reward_last_1000))
 			reward_last_1000 = 0
-
-			# count_non_zero =0 
-			# for key, value in agents[0].Q.items():
-			# 	if value != 0:
-			# 		count_non_zero += 1
-
-			# print("non zero Qs: {0}".format(count_non_zero))
-			# print("total num of Qs: {0}".format(len(agents[0].Q)))
-			# print(agents[0].Q)
 			
 		while status[0]=="IN_GAME":
 			for agent in agents:

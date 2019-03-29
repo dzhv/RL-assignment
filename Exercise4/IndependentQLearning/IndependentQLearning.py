@@ -13,17 +13,15 @@ from copy import deepcopy
 from collections import defaultdict
 		
 class IndependentQLearningAgent(Agent):
-	def __init__(self, learningRate, discountFactor, epsilon, initVals=0.0):
+	def __init__(self, learningRate=0.1, discountFactor=0.9, epsilon=1, initVals=0.0):
 		super(IndependentQLearningAgent, self).__init__()
 
-		self.initLearningRate = 0.15
+		self.initLearningRate = learningRate
 		self.setLearningRate(self.initLearningRate)
-		self.initEpsilon = 1
+		self.initEpsilon = epsilon
 		self.setEpsilon(self.initEpsilon)
-		self.discountFactor = 0.95
+		self.discountFactor = discountFactor
 		self.decay_constant = 0.00025
-
-		# Best:    lr= 0.15, dc = 0.00025  df = 0.95   |   792.24
 
 		self.possibleActions = ['MOVE_UP', 'MOVE_DOWN', 'MOVE_LEFT', 'MOVE_RIGHT', 'KICK', 'NO_OP']
 
@@ -120,7 +118,7 @@ if __name__ == '__main__':
 	MARLEnv = DiscreteMARLEnvironment(numOpponents = args.numOpponents, numAgents = args.numAgents)
 	agents = []
 	for i in range(args.numAgents):
-		agent = IndependentQLearningAgent(learningRate = 0.1, discountFactor = 0.9, epsilon = 1.0)
+		agent = IndependentQLearningAgent()
 		agents.append(agent)
 
 	numEpisodes = args.numEpisodes

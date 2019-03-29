@@ -18,7 +18,7 @@ os.environ['OMP_NUM_THREADS'] = '1'
 if __name__ == "__main__" :
 	
 	value_network = network_factory.create_network()
-	weights_path = "params_last.out"
+	weights_path = "params_last"
 	value_network.load_state_dict(torch.load(weights_path))
 
 	logger = Logger("output.out")

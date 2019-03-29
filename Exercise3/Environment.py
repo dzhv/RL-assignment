@@ -99,18 +99,8 @@ class HFOEnv(object):
 	# You might also give extra information on the name of each rewards
 	# for monitoring purposes.
 	def get_reward(self, status, nextState):
-		# print("Current State, shape: {0}".format(self.curState.shape))
-		# print(self.curState)
-		# print("next State")
-		# print(nextState)
-
-
-
 		reward = 0.0
 		info = {}
-		# print("GOAL value: {0}".format(GOAL))    ==  1		
-		# print("CAPTURED_BY_DEFENSE value: {0}".format(CAPTURED_BY_DEFENSE)) == 2
-		# print("OUT_OF_BOUNDS value: {0}".format(OUT_OF_BOUNDS))   ==  3
 
 		if status == GOAL:
 			reward = 1
@@ -124,7 +114,6 @@ class HFOEnv(object):
 		else:
 			info = { "reason": "Nothing happened"}
 		
-		# 		print("Status: {0}, Reward: {1} granted. Reason: {2}".format(status, reward, info))
 		return reward, info
 
 

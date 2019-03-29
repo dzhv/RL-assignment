@@ -5,14 +5,11 @@ def run(num_episodes, network, environment, policy, logger, counter):
 	last_counter_value = -1
 	counter_checks = 0
 	for i in range(num_episodes):
-		# logger.log("Episode {0}/{1}".format(i, num_episodes))
 		environment.reset()
 
 		while True:
 			state = environment.curState
-			action, q_value = policy.greedyAction(computePredictions(state, network))
-
-			# logger.log(str(networks["learning"].model[2].weight))
+			action, q_value = policy.greedyAction(computePredictions(state, network))			
 
 			nextState, reward, done, status, info = environment.step(environment.possibleActions[action])
 

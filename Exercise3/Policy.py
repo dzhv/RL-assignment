@@ -38,8 +38,6 @@ class Policy():
 
 		self.currStep += 1
 
-		# self.logger.log("To: {0}".format(self.epsilon))
-
 class RandomPolicy():
 	def __init__(self, epsilon=1):
 		self.epsilon = epsilon

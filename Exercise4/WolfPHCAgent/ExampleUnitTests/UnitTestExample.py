@@ -97,10 +97,7 @@ if __name__ == '__main__':
 				correctPol = [float(x) for x in correctPol]
 
 				policyOut = agents[agentIdx].calculatePolicyUpdate()
-				print("expected:")
-				print(correctPol)
-				print("actual:")
-				print(policyOut)
+				
 				for idx in range(len(policyOut)):					
 					if not math.isclose(policyOut[idx], correctPol[idx], abs_tol=1e-4):
 						print("Wrong Policy Output")

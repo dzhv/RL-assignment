@@ -41,7 +41,7 @@ if __name__ == "__main__" :
 		"startingEpsilons": [1, 0.8, 0.5, 0.5, 0.3, 0.1, 0.7, 0.4],
 		"minEpsilons": [0.4, 0.35, 0.25, 0.25, 0.15, 0, 0.3, 0],
 		"numPolicyUpdates": 8000,
-		"discountFactor": args.discountFactor,			# worth exploring
+		"discountFactor": args.discountFactor,
 		"learning_rate": args.lr,
 		"learning_network_update_interval": 6,
 		"target_network_update_interval": 200,

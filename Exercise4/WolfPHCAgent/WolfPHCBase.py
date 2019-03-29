@@ -14,7 +14,7 @@ import numpy as np
 from collections import defaultdict
 		
 class WolfPHCAgent(Agent):
-	def __init__(self, learningRate=0.15, discountFactor=0.99, winDelta=0.001, loseDelta=0.01, initVals=0.0):
+	def __init__(self, learningRate=0.1, discountFactor=0.99, winDelta=0.001, loseDelta=0.01, initVals=0.0):
 		super(WolfPHCAgent, self).__init__()
 
 		self.initLearningRate = learningRate
@@ -26,7 +26,7 @@ class WolfPHCAgent(Agent):
 		self.discountFactor = discountFactor
 		self.delta_update = 0.00000035
 
-		# Best:    lr= 0.15, dc = 0.00025  df = 0.95 winDelta=0.01 loseDelta=0.1   |   608
+		# learningRate=0.1, discountFactor=0.99, winDelta=0.0025, loseDelta=0.01, delta_update 0.0000001  |  580
 
 		self.possibleActions = ['MOVE_UP', 'MOVE_DOWN', 'MOVE_LEFT', 'MOVE_RIGHT', 'KICK', 'NO_OP']
 
@@ -101,9 +101,6 @@ class WolfPHCAgent(Agent):
 		optimal_actions = [a for a in self.possibleActions if self.Q[self.key(self.currState, a)] == maxQ]
 		suboptimal_actions = [a for a in self.possibleActions if self.Q[self.key(self.currState, a)] < maxQ]
 
-		if len(optimal_actions) + len(suboptimal_actions) != len(self.possibleActions):
-			raise Exception("Some actions were lost somehow?")
-
 		delta = self.winDelta if self.agent_is_winning() else self.loseDelta
 
 		p_moved = 0
@@ -145,8 +142,8 @@ class WolfPHCAgent(Agent):
 		self.loseDelta = loseDelta
 	
 	def computeHyperparameters(self, numTakenActions, episodeNumber):
-		loseDelta = min(0.9, self.initLoseDelta + episodeNumber * self.delta_update)
-		winDelta = min(1, self.initWinDelta + episodeNumber * self.delta_update)
+		loseDelta = min(0.2, self.initLoseDelta + episodeNumber * self.delta_update)
+		winDelta = min(0.1, self.initWinDelta + episodeNumber * self.delta_update)
 
 		return loseDelta, winDelta, self.initLearningRate
 

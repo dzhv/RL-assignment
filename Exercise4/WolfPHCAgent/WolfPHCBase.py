@@ -14,7 +14,7 @@ import numpy as np
 from collections import defaultdict
 		
 class WolfPHCAgent(Agent):
-	def __init__(self, learningRate=0.15, discountFactor=0.97, winDelta=0.001, loseDelta=0.01, initVals=0.0):
+	def __init__(self, learningRate=0.15, discountFactor=0.99, winDelta=0.001, loseDelta=0.01, initVals=0.0):
 		super(WolfPHCAgent, self).__init__()
 
 		self.initLearningRate = learningRate
@@ -24,7 +24,7 @@ class WolfPHCAgent(Agent):
 		self.initLoseDelta = loseDelta
 		self.setLoseDelta(self.initLoseDelta)
 		self.discountFactor = discountFactor
-		self.decay_constant = 0.00025
+		self.delta_update = 0.00000035
 
 		# Best:    lr= 0.15, dc = 0.00025  df = 0.95 winDelta=0.01 loseDelta=0.1   |   608
 
@@ -145,8 +145,8 @@ class WolfPHCAgent(Agent):
 		self.loseDelta = loseDelta
 	
 	def computeHyperparameters(self, numTakenActions, episodeNumber):
-		loseDelta = min(0.9, self.initLoseDelta + episodeNumber * 0.00001)
-		winDelta = min(1, self.initWinDelta + episodeNumber * 0.00001)
+		loseDelta = min(0.9, self.initLoseDelta + episodeNumber * self.delta_update)
+		winDelta = min(1, self.initWinDelta + episodeNumber * self.delta_update)
 
 		return loseDelta, winDelta, self.initLearningRate
 

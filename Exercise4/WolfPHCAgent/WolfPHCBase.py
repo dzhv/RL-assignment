@@ -14,7 +14,7 @@ import numpy as np
 from collections import defaultdict
 		
 class WolfPHCAgent(Agent):
-	def __init__(self, learningRate=0.1, discountFactor=0.99, winDelta=0.001, loseDelta=0.01, initVals=0.0):
+	def __init__(self, learningRate=0.1, discountFactor=0.99, winDelta=0.0025, loseDelta=0.01, initVals=0.0):
 		super(WolfPHCAgent, self).__init__()
 
 		self.initLearningRate = learningRate
@@ -24,9 +24,7 @@ class WolfPHCAgent(Agent):
 		self.initLoseDelta = loseDelta
 		self.setLoseDelta(self.initLoseDelta)
 		self.discountFactor = discountFactor
-		self.delta_update = 0.00000035
-
-		# learningRate=0.1, discountFactor=0.99, winDelta=0.0025, loseDelta=0.01, delta_update 0.0000001  |  580
+		self.delta_update = 0.0000001
 
 		self.possibleActions = ['MOVE_UP', 'MOVE_DOWN', 'MOVE_LEFT', 'MOVE_RIGHT', 'KICK', 'NO_OP']
 

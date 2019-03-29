@@ -15,7 +15,7 @@ from itertools import combinations_with_replacement as combinations
 from collections import defaultdict
 		
 class JointQLearningAgent(Agent):
-	def __init__(self, learningRate=0.15, discountFactor=0.9, epsilon=1, numTeammates=1, initVals=0.0):
+	def __init__(self, learningRate=0.15, discountFactor=0.99, epsilon=1, numTeammates=1, initVals=0.0):
 		super(JointQLearningAgent, self).__init__()	
 
 		self.initLearningRate = learningRate
